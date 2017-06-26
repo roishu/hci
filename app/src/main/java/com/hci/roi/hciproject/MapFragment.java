@@ -109,6 +109,10 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                     Intent radarIntent = new Intent(MapFragment.this, RadarActivity.class);
                     startActivityForResult(radarIntent,101);
                 }
+                if(position==1){//2
+                    Intent radarIntent = new Intent(MapFragment.this, HSIActivity.class);
+                    startActivityForResult(radarIntent,101);
+                }
             }
         });
     }
