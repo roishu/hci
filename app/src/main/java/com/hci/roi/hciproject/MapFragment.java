@@ -1,7 +1,9 @@
 package com.hci.roi.hciproject;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.cc.roi.aircc.R;
 import com.google.android.gms.maps.CameraUpdate;
@@ -18,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -39,6 +43,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private MyAdapter mAdapter;
     private ArrayList<DataObject> myDataset;// = {"Mission"};
     private Marker firstMarker;
+    private ArrayList<Marker> markerList;
+    private BitmapDescriptor planeBitmapDrawable;
 
 
     @Override
@@ -73,6 +79,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         mAdapter = new MyAdapter(myDataset);
         mRecyclerView.setAdapter(mAdapter);
 
+        planeBitmapDrawable = BitmapDescriptorFactory.fromResource(R.drawable.plane_icon2);
+
         // Code to Add an item with default animation
         //((MyRecyclerViewAdapter) mAdapter).addItem(obj, index);
 
@@ -93,6 +101,14 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onItemClick(int position, View v) {
                 Log.i(TAG, " Clicked on Item " + position);
+                if(position==3){//4
+                    mRecyclerView.setLayoutParams(new LinearLayout.
+                            LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
+                }
+                if(position==2){//3
+                    Intent radarIntent = new Intent(MapFragment.this, RadarActivity.class);
+                    startActivityForResult(radarIntent,101);
+                }
             }
         });
     }
@@ -132,7 +148,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         firstMarker= googleMap.addMarker(new MarkerOptions()
                 .position(SYDNEY)
                 .title("My Title")
-                .snippet("My Snippet"));
+                .snippet("My Snippet")
+                .icon(planeBitmapDrawable));
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -149,7 +166,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         firstMarker= googleMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("My Title")
-                .snippet("My Snippet"));
+                .snippet("My Snippet")
+                .icon(planeBitmapDrawable));
     }
 
     private void setUpMarkers(final GoogleMap googleMap) {
