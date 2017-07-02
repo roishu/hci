@@ -3,20 +3,16 @@ package com.hci.roi.hciproject;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.cc.roi.aircc.R;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.vision.barcode.Barcode;
 
 import java.util.ArrayList;
 
@@ -110,7 +105,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                     startActivityForResult(radarIntent,101);
                 }
                 if(position==1){//2
-                    Intent radarIntent = new Intent(MapFragment.this, HSIActivity.class);
+                    Intent radarIntent = new Intent(MapFragment.this, ADIActivity.class);
                     startActivityForResult(radarIntent,101);
                 }
             }

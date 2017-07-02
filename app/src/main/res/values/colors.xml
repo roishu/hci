@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#00081421</color>
     <color name="colorAccent">#FF4081</color>
     <color name="primary_dark_roi">#081421</color>
+    <color name="black">#000000</color>
+
 </resources>
