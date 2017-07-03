@@ -48,7 +48,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
-public class MapFragment extends AppCompatActivity implements OnMapReadyCallback  {
+public class MapFragment extends AppCompatActivity implements OnMapReadyCallback ,View.OnClickListener {
     private String TAG = "ROI_YONATAN";
     private static final LatLng PERTH = new LatLng(-31.952854, 115.857342);
     private static final LatLng SYDNEY = new LatLng(-34, 151);
@@ -73,6 +73,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private FloatingActionButton fab1,fab2,fab3,fab4;
     private Bitmap b;
     private Bitmap mutableBitmap;
+    //googleMapCopy
+    private GoogleMap googleMapCopy;
     /*
 
     getApplication().setTheme(Theme.Holo)
@@ -85,11 +87,24 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.main_activity_with_map);
         //members-init
         missionLatLng = new ArrayList<LatLng>();
+        initFab();
+        //
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setLandscapeOrientation();
         setRecycleView();
+    }
+
+    private void initFab() {
+        fab1= (FloatingActionButton) findViewById(R.id.fab1);
+        fab2= (FloatingActionButton) findViewById(R.id.fab2);
+        fab3= (FloatingActionButton) findViewById(R.id.fab3);
+        fab4= (FloatingActionButton) findViewById(R.id.fab4);
+        fab1.setOnClickListener(this);
+        fab2.setOnClickListener(this);
+        fab3.setOnClickListener(this);
+        fab4.setOnClickListener(this);
     }
 
     private void setRecycleView() {
@@ -125,36 +140,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ((MyAdapter) mAdapter).setOnItemClickListener(new MyAdapter
-                .MyClickListener() {
-            @Override
-            public void onItemClick(int position, View v) {
-                Log.i(TAG, " Clicked on Item " + position);
-                if(position==3){//4
-//                    mRecyclerView.setLayoutParams(new LinearLayout.
-//                            LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
-                    Intent radarIntent = new Intent(MapFragment.this, HSIActivity.class);
-                    startActivityForResult(radarIntent,101);
-                }
-                if(position==2){//3
-                    Intent radarIntent = new Intent(MapFragment.this, RadarActivity.class);
-                    startActivityForResult(radarIntent,101);
-                }
-                if(position==1){//2
-                    Intent radarIntent = new Intent(MapFragment.this, ADIActivity.class);
-                    startActivityForResult(radarIntent,101);
-                }
-                if(position==0){
-                    setTheme(R.style.RoiLight);
-                    Log.i(TAG, " setTheme ");
-                    //recreate();
-                }
-            }
-        });
-    }
+
 
     private ArrayList<DataObject> getDataSet() {
         ArrayList results = new ArrayList<DataObject>();
@@ -219,7 +205,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
         //googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-
+        googleMapCopy = googleMap;
 
     }
 
@@ -258,7 +244,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void animatePlane(final GoogleMap googleMap, final LatLng src, LatLng dest){
-
 
         boolean lat = false;
         ValueAnimator va;
@@ -339,10 +324,55 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         planeBitmapDrawable = BitmapDescriptorFactory.fromBitmap(mutableBitmap);
     }
 
+    @Override
+    protected void onResume() {
+        //mRecyclerView.setLayoutParams(new LinearLayout.
+        //LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
+        super.onResume();
+        ((MyAdapter) mAdapter).setOnItemClickListener(new MyAdapter
+                .MyClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+                Log.i(TAG, " Clicked on Item " + position);
+        switch (position){
+            case 0:
+                Intent HSIIntent = new Intent(MapFragment.this, HSIActivity.class);
+                startActivityForResult(HSIIntent,101);
+                break;
+            case 1:
+                Intent ADIIntent = new Intent(MapFragment.this, ADIActivity.class);
+                startActivityForResult(ADIIntent,101);
+                break;
+            case 2:
+                Intent radarIntent = new Intent(MapFragment.this, RadarActivity.class);
+                startActivityForResult(radarIntent,101);
+                break;
+            case 3:
+//                Intent radarIntent = new Intent(MapFragment.this, ADIActivity.class);
+//                startActivityForResult(radarIntent,101);
+                mRecyclerView.setLayoutParams(new LinearLayout.
+                LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
+                break;
+        }
+            }
+        });
+    }
 
-
-
-
-
-
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.fab1:
+                animatePlane(googleMapCopy,missionLatLng.get(2),missionLatLng.get(3));
+                break;
+            case R.id.fab2:
+                animatePlane(googleMapCopy,missionLatLng.get(3),missionLatLng.get(4));
+                break;
+            case R.id.fab3:
+                animatePlane(googleMapCopy,missionLatLng.get(4),missionLatLng.get(5));
+                break;
+            case R.id.fab4:
+                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
+                break;
+        }
+    }
 }

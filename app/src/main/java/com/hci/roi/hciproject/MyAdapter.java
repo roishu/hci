@@ -20,6 +20,7 @@ public class MyAdapter extends RecyclerView
     private static String LOG_TAG = "MyRecyclerViewAdapter";
     private ArrayList<DataObject> mDataset;
     private static MyClickListener myClickListener;
+    private ViewGroup myParentView;
 
     public static class DataObjectHolder extends RecyclerView.ViewHolder
             implements View
@@ -52,17 +53,47 @@ public class MyAdapter extends RecyclerView
     @Override
     public DataObjectHolder onCreateViewHolder(ViewGroup parent,
                                                int viewType) {
+        Log.e("MyAdaperTAG" , "ViewType="+viewType +"");
+        myParentView = parent;
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.my_card_view, parent, false);
+
+        switch(viewType){
+            case 0:
+               view = (LayoutInflater.from(myParentView.getContext())
+                        .inflate(R.layout.card_hsi, myParentView, false));
+                break;
+            case 1:
+                view = (LayoutInflater.from(myParentView.getContext())
+                        .inflate(R.layout.card_adi, myParentView, false));
+                break;
+            case 2:
+                view = (LayoutInflater.from(myParentView.getContext())
+                        .inflate(R.layout.card_radar, myParentView, false));
+
+                break;
+            case 3:
+                view = (LayoutInflater.from(myParentView.getContext())
+                    .inflate(R.layout.my_card_view, myParentView, false));
+                break;
+        }
 
         DataObjectHolder dataObjectHolder = new DataObjectHolder(view);
         return dataObjectHolder;
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
-        holder.label.setText(mDataset.get(position).getmText1());
-        holder.dateTime.setText(mDataset.get(position).getmText2());
+
+
+       // holder.label.setText(mDataset.get(position).getmText1());
+        //holder.dateTime.setText(mDataset.get(position).getmText2());
+        //holder.
     }
 
     public void addItem(DataObject dataObj, int index) {

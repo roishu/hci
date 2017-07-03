@@ -27,6 +27,7 @@ public class RadarView extends View {
     float alpha = 0;
     Point latestPoint[] = new Point[POINT_ARRAY_SIZE];
     Paint latestPaint[] = new Paint[POINT_ARRAY_SIZE];
+    private Paint eraserPaint;
 
     public RadarView(Context context) {
         this(context, null);
@@ -45,6 +46,11 @@ public class RadarView extends View {
         localPaint.setStyle(Paint.Style.STROKE);
         localPaint.setStrokeWidth(1.0F);
         localPaint.setAlpha(0);
+
+        eraserPaint = new Paint();
+        eraserPaint.setColor(Color.BLACK);
+        eraserPaint.setAntiAlias(true);
+        eraserPaint.setStyle(Paint.Style.FILL);
 
         int alpha_step = 255 / POINT_ARRAY_SIZE;
         for (int i=0; i < latestPaint.length; i++) {
@@ -89,7 +95,7 @@ public class RadarView extends View {
         int r = Math.min(width, height);
 
 
-        //canvas.drawRect(0, 0, getWidth(), getHeight(), localPaint);
+        canvas.drawRect(0, 0, getWidth(), getHeight(), eraserPaint);
 
         int i = r / 2;
         int j = i - 1;
