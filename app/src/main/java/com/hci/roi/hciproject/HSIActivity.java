@@ -77,10 +77,6 @@ public class HSIActivity extends AppCompatActivity {
             }
         }, mDuration);
 
-
-
-
-
     }
 
     private void setAnimationProperties(PropertyValuesHolder animatorHolder) {

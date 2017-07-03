@@ -3,23 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.hci.roi.hciproject.MapFragment"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <include android:id="@+id/map_fragment"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="0.8"
-    layout="@layout/map_fragment"/>
+    <LinearLayout
+        android:id="@+id/buttonBar"
+        android:background="@color/primary_dark_roi"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:elevation="5dp"
+        android:layout_weight="0.1">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab1"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab2"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab3"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab4"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9">
+
+        <include
+            android:id="@+id/map_fragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8"
+            layout="@layout/map_fragment"/>
 
 
-    <!-- A RecyclerView with some commonly used attributes -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
-        android:scrollbars="vertical"
-        android:layout_weight="0.2"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"/>
+        <!-- A RecyclerView with some commonly used attributes -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/my_recycler_view"
+            android:scrollbars="vertical"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
 
+    </LinearLayout>
 
 
 
