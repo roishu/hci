@@ -35,6 +35,7 @@ public class HSIView extends View {
     private final Paint textPaint;
     private final Paint eraserPaint;
     private final Paint pilotPaint;
+    private final Paint bgPaint;
     private Bitmap background;
     private float angle = 0;
 
@@ -77,6 +78,10 @@ public class HSIView extends View {
         textPaint.setAntiAlias(true);
         textPaint.setStyle(Paint.Style.STROKE);
         textPaint.setTextSize(100);
+
+        bgPaint = new Paint();
+        bgPaint.setColor(Color.BLACK);
+        bgPaint.setStyle(Paint.Style.FILL);
 
         pilotPaint = new Paint();
         ColorFilter filter = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
@@ -137,7 +142,7 @@ public class HSIView extends View {
         int r = height; //Math.min(width, height);
 
         //canvas.
-        //canvas.drawRect(0, 0, width, height, eraserPaint); //clean window
+        canvas.drawRect(0, 0, width, height, bgPaint); //clean window
         int i = r / 2;
         int j = i - 1;
 
@@ -162,15 +167,15 @@ public class HSIView extends View {
             Point point = latestPoint[x];
             if (point != null) {
                 canvas.drawLine(i, i, point.x, point.y, localPaint);
-                    canvas.drawCircle(i, i, j * 5 / 6, eraserPaint);
+                    canvas.drawCircle(i, i, j * 5 / 6, bgPaint);
             }
         }
         for (int x = 0; x < POINT_ARRAY_SIZE; x+=2) {
             Point point = latestPoint[x];
             if (point != null) {
                 canvas.drawLine(i, i, point.x, point.y, localPaint);
-                canvas.drawCircle(i, i, j * 3 / 4, eraserPaint);
-                canvas.drawCircle(i, i, j * 3 / 4, eraserPaint);
+                canvas.drawCircle(i, i, j * 3 / 4, bgPaint);
+                canvas.drawCircle(i, i, j * 3 / 4, bgPaint);
             }
         }
 
@@ -185,37 +190,6 @@ public class HSIView extends View {
         canvas.drawBitmap(StaticBitmaps.planeBitmap, null, new RectF(i-100, i-100, i+100, i+100), pilotPaint);
 
 
-
-        //canvas.drawBitmap(StaticBitmaps.planeBitmap ,i,i,localPaint);
-        //canvas.drawText("2" , latestPoint[18].x ,latestPoint[17].y -300,textPaint );
-        //canvas.drawText("3" , latestPoint[36].x+300 ,latestPoint[35].y ,textPaint );
-       // canvas.drawText("4" , latestPoint[54].x ,latestPoint[53].y +300,textPaint );
-
-        if (showCircles) {
-//            canvas.drawCircle(i, i, j, eraserPaint);
-//            canvas.drawCircle(i, i, j, eraserPaint);
-//            canvas.drawCircle(i, i, j * 3 / 4, eraserPaint);
-//            canvas.drawCircle(i, i, j >> 1, eraserPaint);
-//            canvas.drawCircle(i, i, j >> 2, eraserPaint);
-//            invalidate();
-        }
-
-
-//        lines = 0;
-//        for (Point p : latestPoint) if (p != null) lines++;
-//
-//        boolean debug = false;
-//        if (debug) {
-//            StringBuilder sb = new StringBuilder(" >> ");
-//            for (Point p : latestPoint) {
-//                if (p != null) sb.append(" (" + p.x + "x" + p.y + ")");
-//            }
-//
-//            Log.d(LOG, sb.toString());
-            //  " - R:" + r + ", i=" + i +
-            //  " - Size: " + width + "x" + height +
-            //  " - Angle: " + angle +
-            //  " - Offset: " + offsetX + "," + offsetY);
         }
 
     }

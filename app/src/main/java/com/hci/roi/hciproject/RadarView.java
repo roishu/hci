@@ -1,5 +1,10 @@
 package com.hci.roi.hciproject;
 
+import android.graphics.BitmapFactory;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.RectF;
 import android.view.View;
 
 import android.content.Context;
@@ -11,6 +16,9 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import com.cc.roi.aircc.R;
+
 /**
  * Created by Roi on 26/06/2017.
  */
@@ -20,6 +28,7 @@ public class RadarView extends View {
 
     private final String LOG = "RadarView";
     private final int POINT_ARRAY_SIZE = 25;
+    private final Paint pilotPaint;
 
     private int fps = 100;
     private boolean showCircles = true;
@@ -57,6 +66,16 @@ public class RadarView extends View {
             latestPaint[i] = new Paint(localPaint);
             latestPaint[i].setAlpha(255 - (i* alpha_step));
         }
+
+        pilotPaint = new Paint();
+        ColorFilter filter = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+        pilotPaint.setColorFilter(filter);
+
+
+        if(StaticBitmaps.planeBitmap!=null) StaticBitmaps.planeBitmap.recycle();
+        StaticBitmaps.planeBitmap = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.plane_icon);
+
     }
 
 
@@ -65,7 +84,7 @@ public class RadarView extends View {
         @Override
         public void run() {
             invalidate();
-            mHandler.postDelayed(this, 1000 / fps);
+            mHandler.postDelayed(this, 0);
         }
     };
 
@@ -109,7 +128,7 @@ public class RadarView extends View {
             canvas.drawCircle(i, i, j >> 2, localPaint);
         }
 
-        alpha -= 0.5;
+        alpha -= 0.75;
         if (alpha < -360) alpha = 0;
         double angle = Math.toRadians(alpha);
         int offsetX =  (int) (i + (float)(i * Math.cos(angle)));
@@ -129,26 +148,13 @@ public class RadarView extends View {
             if (point != null) {
                 canvas.drawLine(i, i, point.x, point.y, latestPaint[x]);
             }
-        }
+        }//for
 
+        canvas.drawBitmap(StaticBitmaps.planeBitmap, null, new RectF(i-100, i-100, i+100, i+100), pilotPaint);
 
-        lines = 0;
-        for (Point p : latestPoint) if (p != null) lines++;
-
-        boolean debug = false;
-        if (debug) {
-            StringBuilder sb = new StringBuilder(" >> ");
-            for (Point p : latestPoint) {
-                if (p != null) sb.append(" (" + p.x + "x" + p.y + ")");
-            }
-
-            Log.d(LOG, sb.toString());
-            //  " - R:" + r + ", i=" + i +
-            //  " - Size: " + width + "x" + height +
-            //  " - Angle: " + angle +
-            //  " - Offset: " + offsetX + "," + offsetY);
-        }
 
     }
 
-}
+    }
+
+

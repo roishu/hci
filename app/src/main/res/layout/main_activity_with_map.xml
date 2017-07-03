@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.hci.roi.hciproject.MapFragment"
     android:orientation="vertical">
 
@@ -18,24 +19,63 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab1"
+            android:src="@mipmap/icon1"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab2"
+            android:src="@mipmap/icon2"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab3"
+            android:src="@mipmap/icon3"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab4"
+            android:src="@mipmap/icon4"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab5"
+            android:src="@mipmap/icon5"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab6"
+            android:src="@mipmap/icon6"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab7"
+            android:src="@mipmap/icon7"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab8"
+            android:src="@mipmap/icon8"
+            android:layout_margin="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab9"
+            android:src="@mipmap/icon9"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />

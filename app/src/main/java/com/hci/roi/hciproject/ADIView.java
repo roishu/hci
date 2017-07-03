@@ -30,6 +30,7 @@ public class ADIView extends View {
     float alpha = 0;
     Point latestPoint[] = new Point[POINT_ARRAY_SIZE];
     Paint latestPaint[] = new Paint[POINT_ARRAY_SIZE];
+    private int anglePivot =0;
 
     public ADIView(Context context) {
         this(context, null);
@@ -137,7 +138,7 @@ public class ADIView extends View {
 
 
         canvas.save();
-        canvas.rotate(-15, width/2, height/2);
+        canvas.rotate(anglePivot, width/2, height/2);
         canvas.drawLine(1*width/6, height/2+pivot, 5*width/6, height/2+pivot, originPaint); //purple pilot line
         canvas.restore();
 

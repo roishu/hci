@@ -10,7 +10,7 @@ import com.cc.roi.aircc.R;
 
 public class ADIActivity extends AppCompatActivity {
 
-    private ADIView mHSIView;
+    private ADIView adiView;
     public ValueAnimator va = ValueAnimator.ofInt(0, 300);
     public int mDuration = 5000; //in millis
 
@@ -19,14 +19,10 @@ public class ADIActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adi);
         setLandscapeOrientation();
-
-        mHSIView = (ADIView) findViewById(R.id.hsiView);
-        mHSIView.setShowCircles(true);
-        mHSIView.startAnimation();
-
+        adiView = (ADIView) findViewById(R.id.adiView);
+        adiView.setShowCircles(true);
+        adiView.startAnimation();
         animADI();
-
-
     }
 
     private void animADI() {
@@ -35,7 +31,7 @@ public class ADIActivity extends AppCompatActivity {
         va.setDuration(mDuration);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                mHSIView.setPivot((int)animation.getAnimatedValue());
+                adiView.setPivot((int)animation.getAnimatedValue());
             }
         });
 

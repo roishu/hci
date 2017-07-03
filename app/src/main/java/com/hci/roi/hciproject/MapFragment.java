@@ -2,6 +2,8 @@ package com.hci.roi.hciproject;
 
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -26,6 +28,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
 import com.cc.roi.aircc.R;
@@ -75,6 +79,13 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private Bitmap mutableBitmap;
     //googleMapCopy
     private GoogleMap googleMapCopy;
+    //context
+    private Context context;
+    private FloatingActionButton fab5;
+    private FloatingActionButton fab6;
+    private FloatingActionButton fab7;
+    private FloatingActionButton fab8;
+    private FloatingActionButton fab9;
     /*
 
     getApplication().setTheme(Theme.Holo)
@@ -85,6 +96,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_with_map);
+        context=this;
         //members-init
         missionLatLng = new ArrayList<LatLng>();
         initFab();
@@ -94,6 +106,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         setLandscapeOrientation();
         setRecycleView();
+
     }
 
     private void initFab() {
@@ -101,10 +114,23 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         fab2= (FloatingActionButton) findViewById(R.id.fab2);
         fab3= (FloatingActionButton) findViewById(R.id.fab3);
         fab4= (FloatingActionButton) findViewById(R.id.fab4);
+        fab5= (FloatingActionButton) findViewById(R.id.fab5);
+        fab6= (FloatingActionButton) findViewById(R.id.fab6);
+        fab7= (FloatingActionButton) findViewById(R.id.fab7);
+        fab8= (FloatingActionButton) findViewById(R.id.fab8);
+        fab9= (FloatingActionButton) findViewById(R.id.fab9);
+
+
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
         fab3.setOnClickListener(this);
         fab4.setOnClickListener(this);
+        fab5.setOnClickListener(this);
+        fab6.setOnClickListener(this);
+        fab7.setOnClickListener(this);
+        fab8.setOnClickListener(this);
+        fab9.setOnClickListener(this);
+
     }
 
     private void setRecycleView() {
@@ -127,7 +153,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
 
 
-        setBitmapWithDirection(0);
+        planeBitmapDrawable = setBitmapWithDirection(0);
         // Code to Add an item with default animation
         //((MyRecyclerViewAdapter) mAdapter).addItem(obj, index);
 
@@ -183,8 +209,14 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Log.e("LatLng" , latLng.toString());
-                replaceDemoMarker(googleMap,latLng);
+//                Log.e("LatLng" , latLng.toString());
+//                replaceDemoMarker(googleMap,latLng);
+                if(!missionLatLng.isEmpty()){
+                    replaceDemoMarker(googleMap, missionLatLng.get(missionLatLng.size()-1));
+                    drawPlaneLine(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
+                    animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
+                }
+
             }
         });
 
@@ -230,7 +262,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
        for(int i=0 ; i<missionLatLng.size() ; i++)
            Log.e("PLANE", ""+ missionLatLng.get(i).longitude + "," + missionLatLng.get(i).latitude);
        // googleMap.addMarker(new MarkerOptions().position(missionLatLng.get(i)));
-        animatePlane(googleMap,missionLatLng.get(3),missionLatLng.get(4));
+        //animatePlane(googleMap,missionLatLng.get(3),missionLatLng.get(4));
     }
 
     public void replaceDemoMarker(GoogleMap googleMap , LatLng latLng){
@@ -252,20 +284,18 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         if(src.latitude != dest.latitude){
             pvh1 = PropertyValuesHolder.ofFloat("1", (float)src.latitude, (float)dest.latitude);
             if(src.latitude > dest.latitude)
-                setBitmapWithDirection(180);
+                planeBitmapDrawable = setBitmapWithDirection(180);
             else
-                setBitmapWithDirection(0);
+                planeBitmapDrawable = setBitmapWithDirection(0);
             lat = true;
         }
         else{
             if(src.longitude > dest.longitude)
-                setBitmapWithDirection(-90);
+                planeBitmapDrawable = setBitmapWithDirection(-90);
             else
-                setBitmapWithDirection(90);
+                planeBitmapDrawable = setBitmapWithDirection(90);
         }
 
-        //Log.e("PLANE", "SRC"+ src.longitude + "," + src.latitude);
-        //Log.e("PLANE", "DEST"+ dest.longitude + "," + dest.latitude);
         va = ValueAnimator.ofPropertyValuesHolder(pvh1);
         va.setDuration(6000);
         final boolean finalLat = lat;
@@ -278,17 +308,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                 //Log.e("PLANE", (double)((float)animation.getAnimatedValue())+"");
             }
         });        va.start();
-
-
-
-//        final Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                setAnimationProperties(pvh3);
-//                va.start();
-//            }
-//        }, 3000);
     }
 
     public Bitmap rotateBitmap(Bitmap source, float angle)
@@ -304,24 +323,21 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    public void setBitmapWithDirection(float angle)
+    public BitmapDescriptor setBitmapWithDirection(float angle)
     {
         Drawable d = getResources().getDrawable( R.drawable.plane_icon3);
         d.setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
-
         b = ((BitmapDrawable) d).getBitmap();
+        b = Bitmap.createScaledBitmap(b, 2*b.getWidth()/3, 2*b.getHeight()/3, false);
         mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
         mutableBitmap = rotateBitmap(mutableBitmap,angle);
         Canvas myCanvas = new Canvas(mutableBitmap);
-
         int myColor = mutableBitmap.getPixel(0,0);
         ColorFilter filter = new LightingColorFilter(myColor, Color.GREEN);
-
         Paint pnt = new Paint();
         pnt.setColorFilter(filter);
         myCanvas.drawBitmap(mutableBitmap,0,0,pnt);
-
-        planeBitmapDrawable = BitmapDescriptorFactory.fromBitmap(mutableBitmap);
+        return BitmapDescriptorFactory.fromBitmap(mutableBitmap);
     }
 
     @Override
@@ -334,35 +350,33 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onItemClick(int position, View v) {
                 Log.i(TAG, " Clicked on Item " + position);
-        switch (position){
-            case 0:
-                Intent HSIIntent = new Intent(MapFragment.this, HSIActivity.class);
-                startActivityForResult(HSIIntent,101);
-                break;
-            case 1:
-                Intent ADIIntent = new Intent(MapFragment.this, ADIActivity.class);
-                startActivityForResult(ADIIntent,101);
-                break;
-            case 2:
-                Intent radarIntent = new Intent(MapFragment.this, RadarActivity.class);
-                startActivityForResult(radarIntent,101);
-                break;
-            case 3:
-//                Intent radarIntent = new Intent(MapFragment.this, ADIActivity.class);
-//                startActivityForResult(radarIntent,101);
-                mRecyclerView.setLayoutParams(new LinearLayout.
-                LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
-                break;
-        }
+                openDialogForResult(position);
             }
         });
+    }
+
+    private void openDialogForResult(int i) {
+        FragmentManager manager = getFragmentManager();
+        CustomDialogFragment editNameDialog = new CustomDialogFragment(context,i);
+        int width = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
+        ((ViewGroup)editNameDialog.getWindow().getDecorView())
+                .getChildAt(0).startAnimation(AnimationUtils.loadAnimation(
+                context,R.anim.out));
+        editNameDialog.show();
+        editNameDialog.getWindow().setLayout(width, height);
+    }
+
+    private void openDialogForResult2(int i) {
+        Intent intent = new Intent(MapFragment.this, CustomDialogFragment.class);
+            startActivityForResult(intent, 999);
     }
 
     @Override
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.fab1:
-                animatePlane(googleMapCopy,missionLatLng.get(2),missionLatLng.get(3));
+                animateMyPlaneOnRoute();
                 break;
             case R.id.fab2:
                 animatePlane(googleMapCopy,missionLatLng.get(3),missionLatLng.get(4));
@@ -374,5 +388,34 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                 animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
         }
+    }
+
+    private void animateMyPlaneOnRoute() {
+        animatePlane(googleMapCopy,missionLatLng.get(1),missionLatLng.get(2));
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                animatePlane(googleMapCopy,missionLatLng.get(2),missionLatLng.get(3));
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        animatePlane(googleMapCopy,missionLatLng.get(3),missionLatLng.get(4));
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                animatePlane(googleMapCopy,missionLatLng.get(4),missionLatLng.get(5));
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
+                                    }
+                                }, 6000);
+                            }
+                        }, 6000);
+                    }
+                }, 6000);
+            }
+        }, 6000);
     }
 }

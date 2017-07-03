@@ -38,7 +38,7 @@
 
         </RelativeLayout>
         <com.hci.roi.hciproject.ADIView
-            android:id="@+id/radarView"
+            android:id="@+id/adiView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
