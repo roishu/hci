@@ -1,6 +1,7 @@
 package com.hci.roi.hciproject;
 
 import android.Manifest;
+import android.animation.IntEvaluator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
@@ -38,10 +40,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
 import com.cc.roi.aircc.R;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,7 +53,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -422,6 +429,44 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMyLocationChange(Location location) {
+// The drawable to use for the circle
+        GradientDrawable d = new GradientDrawable();
+        d.setShape(GradientDrawable.OVAL);
+        d.setSize(500,500);
+        d.setColor(0x555751FF);
+        d.setStroke(5, Color.TRANSPARENT);
 
+        Bitmap bitmap = Bitmap.createBitmap(d.getIntrinsicWidth()
+                , d.getIntrinsicHeight()
+                , Bitmap.Config.ARGB_8888);
+
+        // Convert the drawable to bitmap
+        Canvas canvas = new Canvas(bitmap);
+        d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        d.draw(canvas);
+
+        // Radius of the circle
+        final int radius = 20000;
+
+        // Add the circle to the map
+        final GroundOverlay circle = googleMapCopy.addGroundOverlay(new GroundOverlayOptions()
+                .position(new LatLng(location.getLatitude(),location.getLongitude()), 2 * radius).image(BitmapDescriptorFactory.fromBitmap(bitmap)));
+
+        ValueAnimator valueAnimator = new ValueAnimator();
+        valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimator.setRepeatMode(ValueAnimator.RESTART);
+        valueAnimator.setIntValues(0, radius);
+        valueAnimator.setDuration(2000);
+        valueAnimator.setEvaluator(new IntEvaluator());
+        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float animatedFraction = valueAnimator.getAnimatedFraction();
+                circle.setDimensions(animatedFraction * radius * 2);
+            }
+        });
+
+        valueAnimator.start();
     }
 }

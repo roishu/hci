@@ -32,6 +32,7 @@
         <activity android:name="com.hci.roi.hciproject.RadarActivity" />
         <activity android:name="com.hci.roi.hciproject.ADIActivity" />
         <activity android:name="com.hci.roi.hciproject.HSIActivity"></activity>
+
     </application>
 
 </manifest>

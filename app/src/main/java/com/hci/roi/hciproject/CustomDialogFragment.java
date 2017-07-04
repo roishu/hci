@@ -82,7 +82,8 @@ public class CustomDialogFragment extends Dialog  {
 
     private void animADI() {
 
-
+        va2.setRepeatCount(ValueAnimator.INFINITE);
+        va2.setRepeatMode(ValueAnimator.RESTART);
         va2.setDuration(mDuration2);
         va2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -126,6 +127,8 @@ public class CustomDialogFragment extends Dialog  {
 
     private void setAnimationProperties(PropertyValuesHolder animatorHolder) {
         va = ValueAnimator.ofPropertyValuesHolder(animatorHolder);
+        va.setRepeatCount(ValueAnimator.INFINITE);
+        va.setRepeatMode(ValueAnimator.RESTART);
         va.setDuration(mDuration);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
