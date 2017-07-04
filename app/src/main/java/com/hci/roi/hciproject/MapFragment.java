@@ -1,5 +1,6 @@
 package com.hci.roi.hciproject;
 
+import android.Manifest;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -21,10 +23,13 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DrawableUtils;
@@ -44,6 +49,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -80,8 +86,8 @@ import static com.hci.roi.hciproject.LatLngResource.TEL_AVIV;
 import static com.hci.roi.hciproject.LatLngResource.TIBERIAS;
 import static com.hci.roi.hciproject.LatLngResource.UNKNOWN_SOUTH_EAST_OUT;
 
-public class MapFragment extends AppCompatActivity implements OnMapReadyCallback ,View.OnClickListener
- , GoogleMap.OnMarkerClickListener{
+public class MapFragment extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener
+        , GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener {
     private String TAG = "ROI_YONATAN";
     //mission
     private ArrayList<Mission> planes;
@@ -91,7 +97,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private MyAdapter mAdapter;
     private ArrayList<DataObject> myDataset;// = {"Mission"};
     //menu buttons
-    private FloatingActionButton fab1,fab2,fab3,fab4;
+    private FloatingActionButton fab1, fab2, fab3, fab4;
     //googleMapCopy
     private GoogleMap googleMapCopy;
     //context
@@ -102,6 +108,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private FloatingActionButton fab8;
     private FloatingActionButton fab9;
     private Snackbar mySnackbar;
+    private Object mCircle;
     /*
 
     getApplication().setTheme(Theme.Holo)
@@ -112,7 +119,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_with_map);
-        context=this;
+        context = this;
         //members-init
         planes = new ArrayList<Mission>();
 
@@ -138,31 +145,59 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         }
         // Position the map's camera near JERUSALEM.
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(JERUSALEM));
-
+        googleMapCopy = googleMap;
 //        firstMarker = new MarkerOptions().position(SYDNEY)
 //                .title("My First Mission");
 //        googleMap.addMarker(firstMarker);
 
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
             @Override
             public void onMapClick(LatLng latLng) {
-               Log.e("LatLng" , latLng.toString());
+                Log.e("LatLng", latLng.toString());
 //                replaceDemoMarker(googleMap,latLng);
 //                    replaceDemoMarker(googleMap, missionLatLng.get(missionLatLng.size()-1));
 //                    drawPlaneLine(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
-                    //animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
+                //animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
             }
         });
 
         // Create a LatLngBounds that includes the city of Adelaide in Australia.
-        final LatLngBounds ADELAIDE = new LatLngBounds(BEER_SHEVA,JERUSALEM);
+        final LatLngBounds ADELAIDE = new LatLngBounds(BEER_SHEVA, JERUSALEM);
 
         googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
 
-        googleMapCopy = googleMap;
+
+        setLocationProperties();
+        googleMap.setOnMyLocationChangeListener(this);
         googleMap.setOnMarkerClickListener(this);
+
+
+
         initMissions();
+    }
+
+    private void setLocationProperties() {//location
+        askLocationPremission();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return;
+        }
+        googleMapCopy.setMyLocationEnabled(true);
+        googleMapCopy.getUiSettings().setMyLocationButtonEnabled(false);
+    }
+
+    private void askLocationPremission() {
+        int permissionCheck = ContextCompat.checkSelfPermission(MapFragment.this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            // ask permissions here using below code
+            ActivityCompat.requestPermissions(MapFragment.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101);
+        }
     }
 
     @Override
@@ -385,4 +420,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         fab9.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
     }
 
+    @Override
+    public void onMyLocationChange(Location location) {
+
+    }
 }

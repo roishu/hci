@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cc.roi.aircc">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- GOOGLE MAP API KEY (AIRCC PROJECT) : AIzaSyC9J-47eVNJyS3KbRG5avcK8-wlU8F2zqM -->
     <application
         android:allowBackup="true"
