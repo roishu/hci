@@ -3,6 +3,21 @@ package com.hci.roi.hciproject;
 /**
  * Created by Roi on 14/06/2017.
  */
+
+/*
+IN MAIN !
+
+    private ArrayList<DataObject> getDataSet() {
+        ArrayList results = new ArrayList<DataObject>();
+        for (int index = 0; index < 20; index++) {
+            DataObject obj = new DataObject("Some Primary Text " + index,
+                    "Secondary " + index);
+            results.add(index, obj);
+        }
+        return results;
+    }
+ */
+
 public class DataObject {
     private String mText1;
     private String mText2;
