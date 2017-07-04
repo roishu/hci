@@ -2,10 +2,13 @@ package com.hci.roi.hciproject;
 
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -21,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DrawableUtils;
@@ -53,31 +57,41 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 
 import static com.hci.roi.hciproject.LatLngResource.AFEKA;
+import static com.hci.roi.hciproject.LatLngResource.AL_HADITAH;
+import static com.hci.roi.hciproject.LatLngResource.AMMAN;
+import static com.hci.roi.hciproject.LatLngResource.ARAD;
 import static com.hci.roi.hciproject.LatLngResource.BEER_SHEVA;
+import static com.hci.roi.hciproject.LatLngResource.GAZA_STRIP;
 import static com.hci.roi.hciproject.LatLngResource.HADERA;
 import static com.hci.roi.hciproject.LatLngResource.HAIFA;
+import static com.hci.roi.hciproject.LatLngResource.HAIFA_SEA;
+import static com.hci.roi.hciproject.LatLngResource.HERTZELIA;
+import static com.hci.roi.hciproject.LatLngResource.IBRID;
 import static com.hci.roi.hciproject.LatLngResource.JERUSALEM;
+import static com.hci.roi.hciproject.LatLngResource.KDUMIM;
+import static com.hci.roi.hciproject.LatLngResource.KFAR_SABA;
+import static com.hci.roi.hciproject.LatLngResource.KFAR_YONA;
+import static com.hci.roi.hciproject.LatLngResource.MAALE_ADUMIM;
+import static com.hci.roi.hciproject.LatLngResource.MITZPE_RAMON;
+import static com.hci.roi.hciproject.LatLngResource.NEGEV;
+import static com.hci.roi.hciproject.LatLngResource.RISHON_SEA;
 import static com.hci.roi.hciproject.LatLngResource.SYDNEY;
 import static com.hci.roi.hciproject.LatLngResource.TEL_AVIV;
+import static com.hci.roi.hciproject.LatLngResource.TIBERIAS;
+import static com.hci.roi.hciproject.LatLngResource.UNKNOWN_SOUTH_EAST_OUT;
 
-public class MapFragment extends AppCompatActivity implements OnMapReadyCallback ,View.OnClickListener {
+public class MapFragment extends AppCompatActivity implements OnMapReadyCallback ,View.OnClickListener
+ , GoogleMap.OnMarkerClickListener{
     private String TAG = "ROI_YONATAN";
     //mission
-    private ArrayList<LatLng> missionLatLng;
-    private ArrayList<Polyline> missionRoutes;
     private ArrayList<Mission> planes;
     //Recycle-View-Members
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private MyAdapter mAdapter;
     private ArrayList<DataObject> myDataset;// = {"Mission"};
-    private Marker firstMarker;
-    private ArrayList<Marker> markerList;
-    private BitmapDescriptor planeBitmapDrawable;
     //menu buttons
     private FloatingActionButton fab1,fab2,fab3,fab4;
-    private Bitmap b;
-    private Bitmap mutableBitmap;
     //googleMapCopy
     private GoogleMap googleMapCopy;
     //context
@@ -87,6 +101,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private FloatingActionButton fab7;
     private FloatingActionButton fab8;
     private FloatingActionButton fab9;
+    private Snackbar mySnackbar;
     /*
 
     getApplication().setTheme(Theme.Holo)
@@ -99,29 +114,22 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.main_activity_with_map);
         context=this;
         //members-init
-        missionLatLng = new ArrayList<LatLng>();
-        missionRoutes = new ArrayList<Polyline>();
         planes = new ArrayList<Mission>();
 
         initFab();
-        //
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setLandscapeOrientation();
         setRecycleView();
-        //initMissions();
     }
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         try {
-            // Customise the styling of the base map using a JSON object defined
-            // in a raw resource file.
             boolean success = googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
                             this, R.raw.style_json));
-
             if (!success) {
                 Log.e(TAG, "Style parsing failed.");
             }
@@ -135,54 +143,73 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 //                .title("My First Mission");
 //        googleMap.addMarker(firstMarker);
 
-        firstMarker= googleMap.addMarker(new MarkerOptions()
-                .position(SYDNEY)
-                .title("My Title")
-                .snippet("My Snippet")
-                .icon(planeBitmapDrawable));
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-//                Log.e("LatLng" , latLng.toString());
+               Log.e("LatLng" , latLng.toString());
 //                replaceDemoMarker(googleMap,latLng);
-                if(!missionLatLng.isEmpty()){
-                    replaceDemoMarker(googleMap, missionLatLng.get(missionLatLng.size()-1));
-                    drawPlaneLine(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
-                    animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
-                }
-
+//                    replaceDemoMarker(googleMap, missionLatLng.get(missionLatLng.size()-1));
+//                    drawPlaneLine(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
+                    //animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
             }
         });
 
         // Create a LatLngBounds that includes the city of Adelaide in Australia.
         final LatLngBounds ADELAIDE = new LatLngBounds(BEER_SHEVA,JERUSALEM);
 
-        //googleMap.addMarker(new MarkerOptions().position(HAIFA));
-        //googleMap.addMarker(new MarkerOptions().position(EAST_HAIFA));
-
-        drawPlaneLine(googleMap , HAIFA ,HADERA);
-        drawPlaneLine(googleMap , HADERA ,TEL_AVIV);
-        drawPlaneLine(googleMap , TEL_AVIV ,JERUSALEM);
-        drawPlaneLine(googleMap , JERUSALEM ,BEER_SHEVA);
-
-        addMarkersByMission(googleMap);
-
-        // Constrain the camera target to the Adelaide bounds.
         googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
-        //googleMap.getUiSettings().setZoomControlsEnabled(true);
 
         googleMapCopy = googleMap;
+        googleMap.setOnMarkerClickListener(this);
         initMissions();
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        for(int i=0 ; i<planes.size() ; i++){
+            if(marker.equals(planes.get(i).getPlaneMarker())) {
+                planes.get(i).chooseMarker(true);
+                planes.get(i).showAllPlaneLines();
+            }
+            else {
+                planes.get(i).chooseMarker(false);
+                planes.get(i).hideAllPlaneLines();
+            }
+        }
+        return true;
+    }
+
     private void initMissions() {
-        planes.add(new Mission(this));
-        planes.get(0).replaceDemoMarker(googleMapCopy,HAIFA);
-        planes.add(new Mission(this));
-        planes.get(1).replaceDemoMarker(googleMapCopy,AFEKA);
-        planes.add(new Mission(this));
-        planes.get(2).replaceDemoMarker(googleMapCopy,BEER_SHEVA);
+        planes.add(new Mission(this,googleMapCopy));
+        planes.get(0).replaceMarker(HAIFA);
+        planes.get(0).drawPlaneLine(HAIFA ,HADERA);
+        planes.get(0).drawPlaneLine(HADERA ,TEL_AVIV);
+        planes.get(0).drawPlaneLine(TEL_AVIV ,JERUSALEM);
+        planes.get(0).drawPlaneLine(JERUSALEM ,BEER_SHEVA);
+        //
+        planes.add(new Mission(this,googleMapCopy));
+        planes.get(1).replaceMarker(HADERA);
+        planes.get(1).drawPlaneLine(HADERA ,MAALE_ADUMIM);
+        planes.get(1).drawPlaneLine(MAALE_ADUMIM ,IBRID);
+        planes.get(1).drawPlaneLine(IBRID ,AMMAN);
+        //
+        planes.add(new Mission(this,googleMapCopy));
+        planes.get(2).replaceMarker(TIBERIAS);
+        planes.get(2).drawPlaneLine(TIBERIAS ,HAIFA_SEA);
+        planes.get(2).drawPlaneLine(HAIFA_SEA ,RISHON_SEA);
+        planes.get(2).drawPlaneLine(RISHON_SEA ,GAZA_STRIP);
+        planes.get(2).drawPlaneLine(GAZA_STRIP ,MITZPE_RAMON);
+        planes.get(2).drawPlaneLine(MITZPE_RAMON ,ARAD);
+        //
+        planes.add(new Mission(this,googleMapCopy));
+        planes.get(3).replaceMarker(AL_HADITAH);
+        planes.get(3).drawPlaneLine(AL_HADITAH ,AL_HADITAH);
+        planes.get(3).drawPlaneLine(AL_HADITAH ,UNKNOWN_SOUTH_EAST_OUT);
+        planes.get(3).drawPlaneLine(UNKNOWN_SOUTH_EAST_OUT ,NEGEV);
+        planes.get(3).drawPlaneLine(NEGEV ,BEER_SHEVA);
+
+        hideAllPlaneLines();
     }
 
     private void initFab() {
@@ -204,6 +231,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         fab7.setOnClickListener(this);
         fab8.setOnClickListener(this);
         fab9.setOnClickListener(this);
+
+
     }
 
     private void setRecycleView() {
@@ -223,8 +252,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyAdapter(myDataset);
         mRecyclerView.setAdapter(mAdapter);
-
-        planeBitmapDrawable = setBitmapWithDirection(0);
     }
 
     public void setLandscapeOrientation(){
@@ -232,117 +259,26 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
-
-
-
-
-
-
-    private void drawPlaneLine(GoogleMap googleMap,LatLng src, LatLng dest) {
-        LatLng between_src_dest = new LatLng(src.latitude , dest.longitude);
-
-        //add to mission
-        if(missionLatLng.size()>0 && missionLatLng.get(missionLatLng.size()-1)!=src)
-        missionLatLng.add(src);
-        missionLatLng.add(between_src_dest);
-        missionLatLng.add(dest);
-
-        Polyline line = googleMap.addPolyline(new PolylineOptions()
-                .add(src, between_src_dest , dest )
-                .width(5)
-                .color(Color.MAGENTA)
-                .geodesic(true));
-
-        missionRoutes.add(line);
-
+    private void hideAllPlaneLines() {
+        for(int i=0; i<planes.size() ; i++)
+            planes.get(i).hideAllPlaneLines();
     }
 
-    private void hideAllPlaneLines(GoogleMap googleMap) {
-        for(int i=0; i<missionRoutes.size() ; i++)
-            missionRoutes.get(i).setVisible(false);
+    private void showAllPlaneLines() {
+        for(int i=0; i<planes.size() ; i++)
+            planes.get(i).showAllPlaneLines();
     }
 
-    private void showAllPlaneLines(GoogleMap googleMap) {
-        for(int i=0; i<missionRoutes.size() ; i++)
-            missionRoutes.get(i).setVisible(true);
+    private void hideAllPlanes() {
+        for(int i=0; i<planes.size() ; i++)
+            planes.get(i).getPlaneMarker().setVisible(false);
     }
 
-    private void addMarkersByMission(GoogleMap googleMap) {
-       for(int i=0 ; i<missionLatLng.size() ; i++)
-           Log.e("PLANE", ""+ missionLatLng.get(i).longitude + "," + missionLatLng.get(i).latitude);
-       // googleMap.addMarker(new MarkerOptions().position(missionLatLng.get(i)));
-        //animatePlane(googleMap,missionLatLng.get(3),missionLatLng.get(4));
+    private void showAllPlanes() {
+        for(int i=0; i<planes.size() ; i++)
+            planes.get(i).getPlaneMarker().setVisible(true);
     }
 
-    public void replaceDemoMarker(GoogleMap googleMap , LatLng latLng){
-        if (firstMarker!=null) firstMarker.remove();
-        firstMarker= googleMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title("My Title")
-                .snippet("My Snippet")
-                .anchor(0.5f, 0.5f)
-                .icon(planeBitmapDrawable));
-    }
-
-    public void animatePlane(final GoogleMap googleMap, final LatLng src, LatLng dest){
-
-        boolean lat = false;
-        ValueAnimator va;
-        PropertyValuesHolder pvh1 = PropertyValuesHolder.ofFloat("1", (float)src.longitude, (float)dest.longitude);
-
-        if(src.latitude != dest.latitude){
-            pvh1 = PropertyValuesHolder.ofFloat("1", (float)src.latitude, (float)dest.latitude);
-            if(src.latitude > dest.latitude)
-                planeBitmapDrawable = setBitmapWithDirection(180);
-            else
-                planeBitmapDrawable = setBitmapWithDirection(0);
-            lat = true;
-        }
-        else{
-            if(src.longitude > dest.longitude)
-                planeBitmapDrawable = setBitmapWithDirection(-90);
-            else
-                planeBitmapDrawable = setBitmapWithDirection(90);
-        }
-
-        va = ValueAnimator.ofPropertyValuesHolder(pvh1);
-        va.setDuration(6000);
-        final boolean finalLat = lat;
-        va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if(!finalLat)
-                replaceDemoMarker(googleMap, new LatLng(src.latitude,(double)((float)animation.getAnimatedValue())));
-                else
-                    replaceDemoMarker(googleMap, new LatLng((double)((float)animation.getAnimatedValue()),src.longitude));
-                //Log.e("PLANE", (double)((float)animation.getAnimatedValue())+"");
-            }
-        });        va.start();
-    }
-
-    public Bitmap rotateBitmap(Bitmap source, float angle)
-    {
-        Matrix matrix = new Matrix();
-        matrix.setTranslate(source.getWidth()/2, source.getHeight()/2);
-        matrix.preRotate(angle,source.getWidth()/2, source.getHeight()/2);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
-
-    public BitmapDescriptor setBitmapWithDirection(float angle)
-    {
-        Drawable d = getResources().getDrawable( R.drawable.plane_icon3);
-        d.setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
-        b = ((BitmapDrawable) d).getBitmap();
-        b = Bitmap.createScaledBitmap(b, 2*b.getWidth()/3, 2*b.getHeight()/3, false);
-        mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
-        mutableBitmap = rotateBitmap(mutableBitmap,angle);
-        Canvas myCanvas = new Canvas(mutableBitmap);
-        int myColor = mutableBitmap.getPixel(0,0);
-        ColorFilter filter = new LightingColorFilter(myColor, Color.GREEN);
-        Paint pnt = new Paint();
-        pnt.setColorFilter(filter);
-        myCanvas.drawBitmap(mutableBitmap,0,0,pnt);
-        return BitmapDescriptorFactory.fromBitmap(mutableBitmap);
-    }
 
     @Override
     protected void onResume() {
@@ -360,7 +296,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void openDialogForResult(int i) {
-        FragmentManager manager = getFragmentManager();
         CustomDialogFragment editNameDialog = new CustomDialogFragment(context,i);
         int width = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
         int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
@@ -376,61 +311,78 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.fab1:
-                animateMyPlaneOnRoute();
+                for(int i=0 ; i<planes.size() ; i++)
+                    planes.get(i).animateMyPlaneOnRoute();
                 break;
             case R.id.fab2:
-                hideAllPlaneLines(googleMapCopy);
+                showAllPlaneLines();
                 break;
             case R.id.fab3:
-                showAllPlaneLines(googleMapCopy);
+                hideAllPlaneLines();
                 break;
             case R.id.fab4:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
+                if(mySnackbar!=null && mySnackbar.isShown())
+                    mySnackbar.dismiss();
+                else{
+                    showConfirmDialog();
+                    cancelAllFabs();
+                }
                 break;
             case R.id.fab5:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
             case R.id.fab6:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
             case R.id.fab7:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
             case R.id.fab8:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
             case R.id.fab9:
-                animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
                 break;
         }
     }
 
-    private void animateMyPlaneOnRoute() {
-        animatePlane(googleMapCopy,missionLatLng.get(1),missionLatLng.get(2));
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                animatePlane(googleMapCopy,missionLatLng.get(2),missionLatLng.get(3));
-                handler.postDelayed(new Runnable() {
+    private void showConfirmDialog() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Mission Create")
+                .setMessage("Are you sure you want to make a new mission?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
                     @Override
-                    public void run() {
-                        animatePlane(googleMapCopy,missionLatLng.get(3),missionLatLng.get(4));
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                animatePlane(googleMapCopy,missionLatLng.get(4),missionLatLng.get(5));
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        animatePlane(googleMapCopy,missionLatLng.get(5),missionLatLng.get(6));
-                                    }
-                                }, 6000);
-                            }
-                        }, 6000);
+                    public void onClick(DialogInterface dialog, int which) {
+                        hideAllPlaneLines();
+                        hideAllPlanes();
+                        startMissionCreation();
                     }
-                }, 6000);
-            }
-        }, 6000);
+
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
+
+    private void startMissionCreation() {
+         mySnackbar = Snackbar.make(findViewById(R.id.app_main_layout),
+                "Click to add route, to finish click on 4 button.", Snackbar.LENGTH_INDEFINITE);
+        mySnackbar.show();
+    }
+
+    private void cancelAllFabs() {
+        fab1.setEnabled(false);
+        fab1.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab2.setEnabled(false);
+        fab2.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab3.setEnabled(false);
+        fab3.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab5.setEnabled(false);
+        fab5.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab6.setEnabled(false);
+        fab6.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab7.setEnabled(false);
+        fab7.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab8.setEnabled(false);
+        fab8.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab9.setEnabled(false);
+        fab9.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+    }
+
 }
