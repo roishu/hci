@@ -61,6 +61,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
@@ -119,7 +120,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     //googleMapCopy
     private GoogleMap googleMapCopy;
     //context
-    private Context context;
+    public static Context context;
     private FloatingActionButton fab5;
     private FloatingActionButton fab6;
     private FloatingActionButton fab7;
@@ -128,6 +129,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private Snackbar mySnackbar;
              private boolean mapClickToAddRoute=false;
              private boolean missionCreated = false;
+             private LocationManagerHelper myLocationManager;
+             private int fabColor = Color.rgb(128,203,196);
 
              @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +162,18 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         } catch (Resources.NotFoundException e) {
             Log.e(TAG, "Can't find style. Error: ", e);
         }
+        /*
+        TEST
+        */
+//
+//        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                .target(JERUSALEM) // Sets the center of the map to
+//                .zoom(8)                   // Sets the zoom
+//                //.bearing(location.getBearing()) // Sets the orientation of the camera to east
+//                .tilt(30)    // Sets the tilt of the camera to 30 degrees
+//                .build();    // Creates a CameraPosition from the builder
+//        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+//                cameraPosition));
         // Position the map's camera near JERUSALEM.
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(JERUSALEM));
         googleMapCopy = googleMap;
@@ -175,10 +190,14 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                     planes.get(planes.size()-1).drawSelfPlaneLine(latLng);
                 }
                 Log.e("LatLng", latLng.toString());
-//                replaceDemoMarker(googleMap,latLng);
-//                    replaceDemoMarker(googleMap, missionLatLng.get(missionLatLng.size()-1));
-//                    drawPlaneLine(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
-                //animatePlane(googleMap , missionLatLng.get(missionLatLng.size()-1) ,latLng);
+            }
+        });
+
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                myLocationManager = new LocationManagerHelper(context);
+                myLocationManager.doTest(latLng.latitude,latLng.longitude);
             }
         });
 
@@ -221,8 +240,15 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     public boolean onMarkerClick(Marker marker) {
         for (int i = 0; i < planes.size(); i++) {
             if (marker.equals(planes.get(i).getPlaneMarker())) {
-                planes.get(i).chooseMarker(true);
-                planes.get(i).showAllPlaneLines();
+                if(planes.get(i).getChoose()){
+                    planes.get(i).chooseMarker(false);
+                    planes.get(i).hideAllPlaneLines();
+                }
+                else{
+                    planes.get(i).chooseMarker(true);
+                    planes.get(i).showAllPlaneLines();
+                }
+
             } else {
                 planes.get(i).chooseMarker(false);
                 planes.get(i).hideAllPlaneLines();
@@ -364,9 +390,9 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onClick(View v) {
+        //fabOnClick
         switch (v.getId()) {
             case R.id.fab1:
-                //planes.get(0).setSelf();
                 for (int i = 0; i < planes.size(); i++){
                     if(planes.get(i).handler!=null)
                         planes.get(i).handler = null;
@@ -386,6 +412,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                     mySnackbar.dismiss();
                     returnAllFabs();
                     showAllPlanes();
+                    planes.get(planes.size()-1).hideAllPlaneLines();
                     mapClickToAddRoute = false;
                 } else if(!missionCreated) {
                     missionCreated = true;
@@ -403,10 +430,17 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             case R.id.fab6:
                 break;
             case R.id.fab7:
+
                 break;
             case R.id.fab8:
+                googleMapCopy.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                this, R.raw.day_style_json));
                 break;
             case R.id.fab9:
+                googleMapCopy.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                this, R.raw.style_json));
                 break;
         }
     }
@@ -499,21 +533,21 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
              private void returnAllFabs() {
                  fab1.setEnabled(true);
-                 fab1.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab1.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab2.setEnabled(true);
-                 fab2.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab2.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab3.setEnabled(true);
-                 fab3.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab3.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab5.setEnabled(true);
-                 fab5.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab5.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab6.setEnabled(true);
-                 fab6.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab6.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab7.setEnabled(true);
-                 fab7.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab7.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab8.setEnabled(true);
-                 fab8.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab8.setBackgroundTintList(ColorStateList.valueOf(fabColor));
                  fab9.setEnabled(true);
-                 fab9.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.cast_intro_overlay_button_background_color)));
+                 fab9.setBackgroundTintList(ColorStateList.valueOf(fabColor));
              }
 
              private void returnAllPlanes() {
@@ -524,7 +558,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMyLocationChange(Location location) {
       //  if(!fab2.isEnabled()){
-            //Toast.makeText(this,"GPS CONNECTED",Toast.LENGTH_LONG).show();
+            //Toast.makeText(this,"GPS CONNECTED"+location.getAltitude(),Toast.LENGTH_LONG).show();
             planes.add(new Mission(this,googleMapCopy));
             planes.get(planes.size()-1).replaceMarker(new LatLng(location.getLatitude(),location.getLongitude()));
             //planes.get(planes.size()-1).(new LatLng(location.getLatitude(),location.getLongitude()))
@@ -533,5 +567,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         //}
     }
 
-
-}
+             public static void printElevation(String str) {
+                 Toast.makeText(context,str,Toast.LENGTH_LONG).show();
+             }
+         }

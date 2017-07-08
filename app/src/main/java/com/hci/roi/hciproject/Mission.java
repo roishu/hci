@@ -66,6 +66,7 @@ public class Mission {
     private GroundOverlay groundOverly;
     private boolean self;
     public Handler handler;
+    private boolean choose;
 
     public Marker getPlaneMarker() {
         return planeMarker;
@@ -234,14 +235,20 @@ public class Mission {
     }
 
     public void chooseMarker(boolean bool) {
+        choose = bool;
         planeBitmapDrawable = setBitmapWithDirection(angle,bool);
         replaceMarker(planeMarker.getPosition());
     }
 
     public void animateMyPlaneOnRoute() {
 //        Log.e("PLANE" , "missionLatLng size: "+missionLatLng.size()+"");
-        animatePlane(missionLatLng.get(0),missionLatLng.get(1));
+        animatePlane(missionLatLng.get(0),missionLatLng.get(0));
         handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(missionLatLng.size()>1)
+                    animatePlane(missionLatLng.get(0),missionLatLng.get(1));
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -277,7 +284,8 @@ public class Mission {
                 }, mDuration);
             }
         }, mDuration);
-
+            }
+        }, mDuration);
     }
 
     public void animatePlane(final LatLng src, LatLng dest){
@@ -382,5 +390,9 @@ public class Mission {
             missionLatLng.remove(i);
         for(int i =0 ; i<missionRoutes.size() ; i++)
             missionRoutes.remove(i);
+    }
+
+    public boolean getChoose() {
+        return choose;
     }
 }
