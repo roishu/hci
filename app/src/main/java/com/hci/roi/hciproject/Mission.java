@@ -47,9 +47,7 @@ import static com.hci.roi.hciproject.LatLngResource.ISRAEL_EAST_BOUND;
 import static com.hci.roi.hciproject.LatLngResource.MAALE_ADUMIM;
 import static com.hci.roi.hciproject.LatLngResource.SYDNEY;
 
-/**
- * Created by Roi on 04/07/2017.
- */
+
 
 public class Mission {
 
@@ -242,38 +240,38 @@ public class Mission {
 
     public void animateMyPlaneOnRoute() {
 //        Log.e("PLANE" , "missionLatLng size: "+missionLatLng.size()+"");
-        animatePlane(missionLatLng.get(0),missionLatLng.get(0));
+        animatePlane(missionLatLng.get(0),missionLatLng.get(1));
         handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(missionLatLng.size()>1)
-                    animatePlane(missionLatLng.get(0),missionLatLng.get(1));
+                if(missionLatLng.size()>2)
+                    animatePlane(missionLatLng.get(1),missionLatLng.get(2));
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(missionLatLng.size()>2)
-                animatePlane(missionLatLng.get(1),missionLatLng.get(2));
+                if(missionLatLng.size()>3)
+                animatePlane(missionLatLng.get(2),missionLatLng.get(3));
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if(missionLatLng.size()>3)
-                        animatePlane(missionLatLng.get(2),missionLatLng.get(3));
+                        if(missionLatLng.size()>4)
+                        animatePlane(missionLatLng.get(3),missionLatLng.get(4));
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                if(missionLatLng.size()>4)
-                                animatePlane(missionLatLng.get(3),missionLatLng.get(4));
+                                if(missionLatLng.size()>5)
+                                animatePlane(missionLatLng.get(4),missionLatLng.get(5));
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if(missionLatLng.size()>5)
-                                        animatePlane(missionLatLng.get(4),missionLatLng.get(5));
+                                        if(missionLatLng.size()>6)
+                                        animatePlane(missionLatLng.get(5),missionLatLng.get(6));
                                         handler.postDelayed(new Runnable() {
                                             @Override
                                             public void run() {
-                                                if(missionLatLng.size()>6)
-                                                    animatePlane(missionLatLng.get(5),missionLatLng.get(6));
+                                                if(missionLatLng.size()>7)
+                                                    animatePlane(missionLatLng.get(6),missionLatLng.get(7));
                                             }
                                         }, mDuration);
                                     }

@@ -40,11 +40,13 @@ import android.os.Bundle;
 import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -105,8 +107,7 @@ import static com.hci.roi.hciproject.LatLngResource.TIBERIAS;
 import static com.hci.roi.hciproject.LatLngResource.UNKNOWN_SOUTH_EAST_OUT;
 
 public class MapFragment extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener
-        , GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener
-         {
+        , GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener  , CompoundButton.OnCheckedChangeListener{
     private String TAG = "ROI_YONATAN";
     //mission
     private ArrayList<Mission> planes;
@@ -116,23 +117,19 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private MyAdapter mAdapter;
     private ArrayList<DataObject> myDataset;// = {"Mission"};
     //menu buttons
-    private FloatingActionButton fab1, fab2, fab3, fab4;
+    private FloatingActionButton fab1, fab4,fab5;
     //googleMapCopy
     private GoogleMap googleMapCopy;
     //context
     public static Context context;
-    private FloatingActionButton fab5;
-    private FloatingActionButton fab6;
-    private FloatingActionButton fab7;
-    private FloatingActionButton fab8;
-    private FloatingActionButton fab9;
+    private SwitchCompat switchPlanes,switchRoutes,switchMode;
     private Snackbar mySnackbar;
-             private boolean mapClickToAddRoute=false;
-             private boolean missionCreated = false;
-             private LocationManagerHelper myLocationManager;
-             private int fabColor = Color.rgb(128,203,196);
+    private boolean mapClickToAddRoute = false;
+    private boolean missionCreated = false;
+    private LocationManagerHelper myLocationManager;
+    private int fabColor = Color.rgb(128, 203, 196);
 
-             @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_with_map);
@@ -140,7 +137,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         //members-init
         planes = new ArrayList<Mission>();
 
-        initFab();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -186,8 +183,8 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onMapClick(LatLng latLng) {
-                if (mapClickToAddRoute){
-                    planes.get(planes.size()-1).drawSelfPlaneLine(latLng);
+                if (mapClickToAddRoute) {
+                    planes.get(planes.size() - 1).drawSelfPlaneLine(latLng);
                 }
                 Log.e("LatLng", latLng.toString());
             }
@@ -197,7 +194,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onMapLongClick(LatLng latLng) {
                 myLocationManager = new LocationManagerHelper(context);
-                myLocationManager.doTest(latLng.latitude,latLng.longitude);
+                myLocationManager.doTest(latLng.latitude, latLng.longitude);
             }
         });
 
@@ -207,11 +204,10 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
 
 
-
         googleMap.setOnMyLocationChangeListener(this);
         googleMap.setOnMarkerClickListener(this);
 
-
+        initGUI();
         initMissions();
     }
 
@@ -238,13 +234,13 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        switchRoutes.setChecked(false);
         for (int i = 0; i < planes.size(); i++) {
             if (marker.equals(planes.get(i).getPlaneMarker())) {
-                if(planes.get(i).getChoose()){
+                if (planes.get(i).getChoose()) {
                     planes.get(i).chooseMarker(false);
                     planes.get(i).hideAllPlaneLines();
-                }
-                else{
+                } else {
                     planes.get(i).chooseMarker(true);
                     planes.get(i).showAllPlaneLines();
                 }
@@ -289,25 +285,24 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         hideAllPlaneLines();
     }
 
-    private void initFab() {
+    private void initGUI() {
         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
-        fab3 = (FloatingActionButton) findViewById(R.id.fab3);
         fab4 = (FloatingActionButton) findViewById(R.id.fab4);
         fab5 = (FloatingActionButton) findViewById(R.id.fab5);
-        fab6 = (FloatingActionButton) findViewById(R.id.fab6);
-        fab7 = (FloatingActionButton) findViewById(R.id.fab7);
-        fab8 = (FloatingActionButton) findViewById(R.id.fab8);
-        fab9 = (FloatingActionButton) findViewById(R.id.fab9);
         fab1.setOnClickListener(this);
-        fab2.setOnClickListener(this);
-        fab3.setOnClickListener(this);
         fab4.setOnClickListener(this);
         fab5.setOnClickListener(this);
-        fab6.setOnClickListener(this);
-        fab7.setOnClickListener(this);
-        fab8.setOnClickListener(this);
-        fab9.setOnClickListener(this);
+
+        switchPlanes = (SwitchCompat) findViewById(R.id.switch1);
+        switchRoutes = (SwitchCompat) findViewById(R.id.switch2);
+        switchMode = (SwitchCompat) findViewById(R.id.switch3);
+
+        switchPlanes.setOnCheckedChangeListener(this);
+        switchRoutes.setOnCheckedChangeListener(this);
+        switchMode.setOnCheckedChangeListener(this);
+        switchPlanes.setChecked(true);
+        switchRoutes.setChecked(false);
+        switchMode.setChecked(true);
 
 
     }
@@ -339,6 +334,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
     private void hideAllPlaneLines() {
         for (int i = 0; i < planes.size(); i++)
             planes.get(i).hideAllPlaneLines();
+        switchRoutes.setChecked(false);
     }
 
     private void showAllPlaneLines() {
@@ -359,8 +355,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onResume() {
-        //mRecyclerView.setLayoutParams(new LinearLayout.
-        //LayoutParams(mRecyclerView.getWidth()*2,mRecyclerView.getHeight()));
         super.onResume();
         ((MyAdapter) mAdapter).setOnItemClickListener(new MyAdapter
                 .MyClickListener() {
@@ -372,7 +366,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    public void sendToServer(String str){
+    public void sendToServer(String str) {
         new MissionTask(str).execute();
     }
 
@@ -387,99 +381,112 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         editNameDialog.getWindow().setLayout(width, height);
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        //Switch Listener
+        switch (buttonView.getId()) {
+            case R.id.switch1: //planes
+                if(isChecked){
+                    showAllPlanes();
+                }
+                else{
+                    hideAllPlanes();
+                }
+                break;
+            case R.id.switch2: //routes
+                if(isChecked){
+                    showAllPlaneLines();
+                }
+                else{
+                    hideAllPlaneLines();
+                }
+                break;
+            case R.id.switch3: //mode
+                if(isChecked){
+                    googleMapCopy.setMapStyle(
+                            MapStyleOptions.loadRawResourceStyle(
+                                    this, R.raw.style_json));
+                }
+                else{
+                    googleMapCopy.setMapStyle(
+                            MapStyleOptions.loadRawResourceStyle(
+                                    this, R.raw.day_style_json));
+                }
+                break;
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
         //fabOnClick
         switch (v.getId()) {
-            case R.id.fab1:
-                for (int i = 0; i < planes.size(); i++){
-                    if(planes.get(i).handler!=null)
+            case R.id.fab1: //play
+                for (int i = 0; i < planes.size(); i++) {
+                    if (planes.get(i).handler != null)
                         planes.get(i).handler = null;
                     planes.get(i).animateMyPlaneOnRoute();
                 }
 
                 break;
-            case R.id.fab2:
-                showAllPlaneLines();
-                break;
-            case R.id.fab3:
-                hideAllPlaneLines();
-                break;
-            case R.id.fab4:
+            case R.id.fab4: //create new mission
                 if (mySnackbar != null && mySnackbar.isShown()) {
                     //finish creating mission-
                     mySnackbar.dismiss();
                     returnAllFabs();
+                    switchPlanes.setChecked(false);
                     showAllPlanes();
-                    planes.get(planes.size()-1).hideAllPlaneLines();
+                    switchRoutes.setChecked(false);
+                    planes.get(planes.size() - 1).hideAllPlaneLines();
                     mapClickToAddRoute = false;
-                } else if(!missionCreated) {
+                } else if (!missionCreated) {
                     missionCreated = true;
-                    showConfirmDialog();
+                    showMissionConfirmDialog();
                     cancelAllFabs();
-                }
-                else if(missionCreated) {
-                    showConfirmDialog();
+                } else if (missionCreated) {
+                    showMissionConfirmDialog();
                     cancelAllFabs();
                 }
                 break;
             case R.id.fab5:
                 showServerConfirmDialog();
                 break;
-            case R.id.fab6:
-                break;
-            case R.id.fab7:
-
-                break;
-            case R.id.fab8:
-                googleMapCopy.setMapStyle(
-                        MapStyleOptions.loadRawResourceStyle(
-                                this, R.raw.day_style_json));
-                break;
-            case R.id.fab9:
-                googleMapCopy.setMapStyle(
-                        MapStyleOptions.loadRawResourceStyle(
-                                this, R.raw.style_json));
-                break;
         }
     }
 
-             private void printMissionsToLog() {
-                 for (int i = 0; i < planes.size(); i++){
-                     for (int j = 0; j < planes.get(i).getMissionLatLng().size(); j++){
-                         LatLng mission = planes.get(i).getMissionLatLng().get(j);
-                         String str = "planeID:"+i + " Latitude"+mission.latitude +" Longitude"+mission.longitude;
-                         Log.d("MISSION",str);
-                         sendToServer(str);
-                     }
-                     Log.d("MISSION","__________________________________________");
-                 }
-             }
+    private void printMissionsToLog() {
+        for (int i = 0; i < planes.size(); i++) {
+            for (int j = 0; j < planes.get(i).getMissionLatLng().size(); j++) {
+                LatLng mission = planes.get(i).getMissionLatLng().get(j);
+                String str = "planeID:" + i + " Latitude" + mission.latitude + " Longitude" + mission.longitude;
+                Log.d("MISSION", str);
+                sendToServer(str);
+            }
+            Log.d("MISSION", "__________________________________________");
+        }
+    }
 
 
-             private void showConfirmDialog() {
+    private void showMissionConfirmDialog() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Mission Create")
                 .setMessage("Are you sure you want to make a new mission?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                {
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if(missionCreated){
-                            planes.get(planes.size()-1).delete();
-                            planes.remove(planes.size()-1);
+                        if (missionCreated) {
+                            planes.get(planes.size() - 1).delete();
+                            planes.remove(planes.size() - 1);
                         }
                         setLocationProperties();
                         hideAllPlaneLines();
+                        switchRoutes.setChecked(false);
                         hideAllPlanes();
                         snackOfMissionCreation();
                     }
-
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener()
-                {
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         returnAllFabs();
@@ -489,85 +496,56 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                 .show();
     }
 
-             private void showServerConfirmDialog() {
-                 new AlertDialog.Builder(this)
-                         .setIcon(android.R.drawable.ic_dialog_alert)
-                         .setTitle("Mission Log Export")
-                         .setMessage("Are you sure you want to export missions ?")
-                         .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                         {
-                             @Override
-                             public void onClick(DialogInterface dialog, int which) {
-                                printMissionsToLog();
-                             }
-
-                         })
-                         .setNegativeButton("No", null)
-                         .show();
-             }
+    private void showServerConfirmDialog() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Mission Log Export")
+                .setMessage("Are you sure you want to export missions ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        printMissionsToLog();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
 
     private void snackOfMissionCreation() {
-         mySnackbar = Snackbar.make(findViewById(R.id.app_main_layout),
-                "Click to add route, to finish click on 4 button.", Snackbar.LENGTH_INDEFINITE);
+        mySnackbar = Snackbar.make(findViewById(R.id.app_main_layout),
+                "Click to add route, to finish click on + button.", Snackbar.LENGTH_INDEFINITE);
         mySnackbar.show();
     }
 
     private void cancelAllFabs() {
-             fab1.setEnabled(false);
-             fab1.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab2.setEnabled(false);
-             fab2.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab3.setEnabled(false);
-             fab3.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab5.setEnabled(false);
-             fab5.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab6.setEnabled(false);
-             fab6.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab7.setEnabled(false);
-             fab7.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab8.setEnabled(false);
-             fab8.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-             fab9.setEnabled(false);
-             fab9.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-         }
+        fab1.setEnabled(false);
+        fab1.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        fab5.setEnabled(false);
+        fab5.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+        switchPlanes.setEnabled(false);
+        switchRoutes.setEnabled(false);
+        switchMode.setEnabled(false);
+    }
 
-             private void returnAllFabs() {
-                 fab1.setEnabled(true);
-                 fab1.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab2.setEnabled(true);
-                 fab2.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab3.setEnabled(true);
-                 fab3.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab5.setEnabled(true);
-                 fab5.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab6.setEnabled(true);
-                 fab6.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab7.setEnabled(true);
-                 fab7.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab8.setEnabled(true);
-                 fab8.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-                 fab9.setEnabled(true);
-                 fab9.setBackgroundTintList(ColorStateList.valueOf(fabColor));
-             }
-
-             private void returnAllPlanes() {
-                 showAllPlaneLines();
-                 showAllPlanes();
-             }
+    private void returnAllFabs() {
+        fab1.setEnabled(true);
+        fab1.setBackgroundTintList(ColorStateList.valueOf(fabColor));
+        fab5.setEnabled(true);
+        fab5.setBackgroundTintList(ColorStateList.valueOf(fabColor));
+        switchPlanes.setEnabled(true);
+        switchRoutes.setEnabled(true);
+        switchMode.setEnabled(true);
+    }
 
     @Override
     public void onMyLocationChange(Location location) {
-      //  if(!fab2.isEnabled()){
-            //Toast.makeText(this,"GPS CONNECTED"+location.getAltitude(),Toast.LENGTH_LONG).show();
-            planes.add(new Mission(this,googleMapCopy));
-            planes.get(planes.size()-1).replaceMarker(new LatLng(location.getLatitude(),location.getLongitude()));
-            //planes.get(planes.size()-1).(new LatLng(location.getLatitude(),location.getLongitude()))
-            planes.get(planes.size()-1).setSelf();
-            mapClickToAddRoute=true;
-        //}
+        planes.add(new Mission(this, googleMapCopy));
+        planes.get(planes.size() - 1).replaceMarker(new LatLng(location.getLatitude(), location.getLongitude()));
+        planes.get(planes.size() - 1).setSelf();
+        mapClickToAddRoute = true;
     }
 
-             public static void printElevation(String str) {
-                 Toast.makeText(context,str,Toast.LENGTH_LONG).show();
-             }
-         }
+    public static void printElevation(String str) {
+        Toast.makeText(context, str, Toast.LENGTH_LONG).show();
+    }
+}

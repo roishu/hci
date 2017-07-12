@@ -76,6 +76,7 @@ public class CustomDialogFragment extends Dialog  {
                 mRadarView.startAnimation();
                 break;
             case 3:
+                setContentView(R.layout.activity_ariel_view);
                 break;
         }
     }

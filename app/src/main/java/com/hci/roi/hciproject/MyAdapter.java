@@ -97,7 +97,7 @@ public class MyAdapter extends RecyclerView
                 break;
             case 3:
                 view = (LayoutInflater.from(myParentView.getContext())
-                    .inflate(R.layout.my_card_view, myParentView, false));
+                    .inflate(R.layout.card_ariel_view, myParentView, false));
                 break;
         }
 

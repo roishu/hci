@@ -20,66 +20,56 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab1"
-            android:src="@mipmap/icon1"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab2"
-            android:src="@mipmap/icon2"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab3"
-            android:src="@mipmap/icon3"
+            android:src="@drawable/icon1"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab4"
-            android:src="@mipmap/icon4"
+            android:src="@drawable/icon4"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab5"
-            android:src="@mipmap/icon5"
+            android:src="@drawable/icon5"
             android:layout_margin="5dp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab6"
-            android:src="@mipmap/icon6"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch1"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Show Planes"
+            android:background="@android:color/transparent"
+            android:textColor="@color/accent_material_dark"
+            android:button="@null"
+            android:padding="20dp"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab7"
-            android:src="@mipmap/icon7"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch2"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Show Routes"
+            android:background="@android:color/transparent"
+            android:textColor="@color/accent_material_dark"
+            android:button="@null"
+            android:padding="20dp"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab8"
-            android:src="@mipmap/icon8"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch3"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Night Mode"
+            android:background="@android:color/transparent"
+            android:textColor="@color/accent_material_dark"
+            android:button="@null"
+            android:padding="20dp"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab9"
-            android:src="@mipmap/icon9"
-            android:layout_margin="5dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+
     </LinearLayout>
 
     <LinearLayout
