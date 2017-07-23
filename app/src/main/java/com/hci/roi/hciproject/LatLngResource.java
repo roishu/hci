@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by Roi on 04/07/2017.
+ * static latlng list.
  */
 
 public class LatLngResource {

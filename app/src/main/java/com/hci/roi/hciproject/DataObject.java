@@ -2,25 +2,14 @@ package com.hci.roi.hciproject;
 
 /**
  * Created by Roi on 14/06/2017.
+ * for each view card we can add lable and description text this is been added to the semi-views of the project.
  */
 
-/*
-IN MAIN !
 
-    private ArrayList<DataObject> getDataSet() {
-        ArrayList results = new ArrayList<DataObject>();
-        for (int index = 0; index < 20; index++) {
-            DataObject obj = new DataObject("Some Primary Text " + index,
-                    "Secondary " + index);
-            results.add(index, obj);
-        }
-        return results;
-    }
- */
 
 public class DataObject {
-    private String mText1;
-    private String mText2;
+    private String mText1; //lable
+    private String mText2; //description
 
     DataObject (String text1, String text2){
         mText1 = text1;

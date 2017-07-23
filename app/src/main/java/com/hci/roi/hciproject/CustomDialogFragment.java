@@ -29,6 +29,7 @@ import com.cc.roi.aircc.R;
 
 /**
  * Created by Roi on 03/07/2017.
+ * this class is a custom dialog which represent the semi-views of the system - HSI,ADI,RADER and ARIALVIEW
  */
 
 public class CustomDialogFragment extends Dialog  {
@@ -36,15 +37,12 @@ public class CustomDialogFragment extends Dialog  {
     private RadarView mRadarView;
     private HSIView mHSIView;
     private ADIView mADIView;
-    private LinearLayout container;
-    private boolean firstOnWindowFocusChangedCall = false;
-    public ValueAnimator va;// = ValueAnimator.ofFloat(0, 120);
-    public int mDuration = 5000; //in millis
-    private PropertyValuesHolder animatorHolder;
+    public ValueAnimator va;
+    public int mDuration = 5000;
     private int chosenViewIndex;
     //ADI-MEMBERS
     public ValueAnimator va2 = ValueAnimator.ofInt(0, 300);
-    public int mDuration2 = 5000; //in millis
+    public int mDuration2 = 5000;
 
     public CustomDialogFragment(@NonNull Context context, int i) {
         super(context,R.style.CustomDialogStyle);
@@ -65,7 +63,6 @@ public class CustomDialogFragment extends Dialog  {
             case 1:
                 setContentView(R.layout.activity_adi);
                 mADIView = (ADIView) findViewById(R.id.adiView);
-                mADIView.setShowCircles(true);
                 mADIView.startAnimation();
                 animADI();
                 break;
@@ -81,6 +78,7 @@ public class CustomDialogFragment extends Dialog  {
         }
     }
 
+    //animate ADI
     private void animADI() {
 
         va2.setRepeatCount(ValueAnimator.INFINITE);
@@ -96,16 +94,13 @@ public class CustomDialogFragment extends Dialog  {
 
     }
 
+    //animate HSI
     private void animHSI() {
-
-
         PropertyValuesHolder pvh1 = PropertyValuesHolder.ofFloat("1", 0f, 150f);
         final PropertyValuesHolder pvh2 = PropertyValuesHolder.ofFloat("2", 150f, 45f);
         final PropertyValuesHolder pvh3 = PropertyValuesHolder.ofFloat("3", 45f, 360f);
-
         setAnimationProperties(pvh1);
         va.start();
-
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -126,6 +121,7 @@ public class CustomDialogFragment extends Dialog  {
 
     }
 
+    //animate properties (duration and behaviour)
     private void setAnimationProperties(PropertyValuesHolder animatorHolder) {
         va = ValueAnimator.ofPropertyValuesHolder(animatorHolder);
         va.setRepeatCount(ValueAnimator.INFINITE);
@@ -134,7 +130,6 @@ public class CustomDialogFragment extends Dialog  {
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mHSIView.setAngle((float)animation.getAnimatedValue());
-                //Log.e("ANIMATOR" ,(float)animation.getAnimatedValue()+"" ); //WORK!
             }
         });
     }

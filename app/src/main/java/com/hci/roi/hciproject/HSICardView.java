@@ -19,11 +19,12 @@ import com.cc.roi.aircc.R;
 
 /**
  * Created by Roi on 26/06/2017.
+ * copy of hsi view in other sizes.
  */
 
 
 public class HSICardView extends View {
-
+    //
     private final String LOG = "HSIView";
     private final int POINT_ARRAY_SIZE = 72;
     private final Paint localPaint;

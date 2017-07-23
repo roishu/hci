@@ -13,22 +13,29 @@ import android.widget.RelativeLayout;
 
 import com.cc.roi.aircc.R;
 
+/**
+ * HSI - horizontal situation indicator
+ * works like a compass
+ * in this activity we're creating an instance of HSIView which is the canvas we want to display.
+ */
 public class HSIActivity extends AppCompatActivity {
 
     private HSIView mHSIView;
     private LinearLayout container;
     private boolean firstOnWindowFocusChangedCall = false;
-    public ValueAnimator va;// = ValueAnimator.ofFloat(0, 120);
-    public int mDuration = 5000; //in millis
-    private PropertyValuesHolder animatorHolder;
+    public ValueAnimator va;
+    public int mDuration = 5000;
 
+    /*
+    in case of first initialization there's a need to send params,
+    we don't know the params of the device before we compile the app
+    so we're creating the HSI right after the application is been compiled.
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        Log.e("WHERE AM I" , getApplicationContext().toString());
         super.onWindowFocusChanged(hasFocus);
         if(firstOnWindowFocusChangedCall){
             container = (LinearLayout) findViewById(R.id.hsi_container);
-            Log.e("WHERE AM I" , getParentActivityIntent().toString());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(container.getHeight() , container.getHeight());
             RelativeLayout.LayoutParams cParams = new RelativeLayout.LayoutParams(container.getHeight() , container.getHeight());
             container.setLayoutParams(cParams);
@@ -49,16 +56,13 @@ public class HSIActivity extends AppCompatActivity {
 
     }
 
+    //animation
     private void animHSI() {
-
-
         PropertyValuesHolder pvh1 = PropertyValuesHolder.ofFloat("1", 0f, 150f);
         final PropertyValuesHolder pvh2 = PropertyValuesHolder.ofFloat("2", 150f, 45f);
         final PropertyValuesHolder pvh3 = PropertyValuesHolder.ofFloat("3", 45f, 360f);
-
         setAnimationProperties(pvh1);
         va.start();
-
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -79,6 +83,7 @@ public class HSIActivity extends AppCompatActivity {
 
     }
 
+    //animatio properites (duration and behavior)
     private void setAnimationProperties(PropertyValuesHolder animatorHolder) {
         va = ValueAnimator.ofPropertyValuesHolder(animatorHolder);
         va.setDuration(mDuration);
@@ -90,7 +95,7 @@ public class HSIActivity extends AppCompatActivity {
         });
     }
 
-
+    //we must set orientation to landscape orientation in every activity in order to unable roatation.
     public void setLandscapeOrientation(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);

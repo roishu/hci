@@ -2,6 +2,7 @@ package com.hci.roi.hciproject;
 
 /**
  * Created by Roi on 19/06/2017.
+ * unused class but will be helpfull if we want to add other planes like - helicopters or battle planes..
  */
 public class CustomMarker
 {

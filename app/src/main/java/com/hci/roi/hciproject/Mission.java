@@ -48,7 +48,16 @@ import static com.hci.roi.hciproject.LatLngResource.MAALE_ADUMIM;
 import static com.hci.roi.hciproject.LatLngResource.SYDNEY;
 
 
-
+/*
+here we diaply each plane as "Mission"
+the mission hold -
+- plane latlng in his route
+- routes
+- targets
+- animation on each route
+- color (green = safe , cyan= safe and chosen , red = danger, orange= danger and chosen)
+- a plane which's connected to the gps device is also holds an circle-overly and its animation
+ */
 public class Mission {
 
     private final BitmapDescriptor targetBitmap;
@@ -106,7 +115,8 @@ public class Mission {
     /**
      * line functions
      */
-
+    //draw plane line from src to destination in 90 degrees connection latlng which's added automatically to the array list.
+    //plane line/route is colored by MAGENTA
     public void drawPlaneLine(LatLng src, LatLng dest) {
         LatLng between_src_dest = new LatLng(src.latitude, dest.longitude);
 
@@ -132,6 +142,7 @@ public class Mission {
 
     }
 
+    //hide all plane's lines
     public void hideAllPlaneLines() {
         for (int i = 0; i < missionRoutes.size(); i++)
             missionRoutes.get(i).setVisible(false);
@@ -139,7 +150,7 @@ public class Mission {
             missionTargets.get(j).setVisible(false);
 
     }
-
+    //display all plane's lines
     public void showAllPlaneLines() {
         for (int i = 0; i < missionRoutes.size(); i++){
             missionRoutes.get(i).setVisible(true);
@@ -147,18 +158,17 @@ public class Mission {
                 missionTargets.get(j).setVisible(true);
         }
     }
-
-
     /**
      * marker functions
      */
+    //get rotated plane with angle *BITMAP!*
     public Bitmap rotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.setTranslate(source.getWidth() / 2, source.getHeight() / 2);
         matrix.preRotate(angle, source.getWidth() / 2, source.getHeight() / 2);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
-
+    //set bitmap in every step in order to detect rotations or other behaviour.
     public BitmapDescriptor setBitmapWithDirection(float new_angle, boolean choose) {
         bool = choose;
         angle = new_angle;
@@ -182,7 +192,7 @@ public class Mission {
         myCanvas.drawBitmap(mutableBitmap, 0, 0, pnt);
         return BitmapDescriptorFactory.fromBitmap(mutableBitmap);
     }
-
+    //get target bitmap (just an icon without functionality)
     public BitmapDescriptor getMissionTarget(float new_angle, boolean choose) {
         bool = choose;
         angle = new_angle;
@@ -203,10 +213,10 @@ public class Mission {
         return BitmapDescriptorFactory.fromBitmap(mutableBitmap);
     }
 
+    //draw the bitmap in the current latlng of the route
+    //there's a check inside of marker behavior
+    public void replaceMarker(LatLng latLng) {
 
-    public void replaceMarker(LatLng latLng) { //add DataObject
-
-        //Log.e("DANGER" , "latLng: " + latLng.longitude + "| MAALE_ADUMIM: "+MAALE_ADUMIM.longitude + "| danger:"+danger);
         if (planeMarker!=null) planeMarker.remove();
         if(latLng.longitude > ISRAEL_EAST_BOUND.longitude && !danger){
             Log.e("DANGER" , "danger = true");
@@ -221,25 +231,25 @@ public class Mission {
 
         planeMarker= googleMap.addMarker(new MarkerOptions()
                 .position(latLng)
-//                .title("My Title")
-//                .snippet("My Snippet")
                 .anchor(0.5f, 0.5f)
                 .icon(planeBitmapDrawable));
     }
 
+    //rotate plane
     public void rotateMarker(float angle) {
         planeBitmapDrawable = setBitmapWithDirection(angle,bool);
         replaceMarker(planeMarker.getPosition());
     }
 
+    //change marker color to chosen marker
     public void chooseMarker(boolean bool) {
         choose = bool;
         planeBitmapDrawable = setBitmapWithDirection(angle,bool);
         replaceMarker(planeMarker.getPosition());
     }
 
+    //animate a plane flight in his routes.
     public void animateMyPlaneOnRoute() {
-//        Log.e("PLANE" , "missionLatLng size: "+missionLatLng.size()+"");
         animatePlane(missionLatLng.get(0),missionLatLng.get(1));
         handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -286,6 +296,7 @@ public class Mission {
         }, mDuration);
     }
 
+    //animate plane in 1 route.
     public void animatePlane(final LatLng src, LatLng dest){
         boolean lat = false;
         ValueAnimator va;
@@ -319,7 +330,7 @@ public class Mission {
         });        va.start();
     }//animatePlane
 
-
+    //self plane will draw a circle
     public void initDrawGroundCircle(){
         d = new GradientDrawable();
         d.setShape(GradientDrawable.OVAL);
@@ -338,6 +349,7 @@ public class Mission {
         groundRadius = 20000;
 
     }
+    //draw circle in location
     public void drawGroundCircle(Location location) {
         // Add the circle to the map
         if (groundOverly==null){
@@ -364,6 +376,7 @@ public class Mission {
         valueAnimator.start();
     }
 
+    //set marker as an gps marker
     public void setSelf() {
         self = true;
         Location temp = new Location(LocationManager.GPS_PROVIDER);
@@ -372,6 +385,7 @@ public class Mission {
         drawGroundCircle(temp);
     }
 
+    //draw line
     public void drawSelfPlaneLine(LatLng dest) {
         LatLng src = planeMarker.getPosition();
         if(!missionLatLng.isEmpty())
@@ -379,6 +393,7 @@ public class Mission {
         drawPlaneLine(src,dest);
     }
 
+    //delete marker - in order to change self marker (if we re-creating our own mission)
     public void delete() {
         hideAllPlaneLines();
         getPlaneMarker().setVisible(false);
@@ -390,6 +405,7 @@ public class Mission {
             missionRoutes.remove(i);
     }
 
+    //boolean
     public boolean getChoose() {
         return choose;
     }

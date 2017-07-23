@@ -134,19 +134,15 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_with_map);
         context = this;
-        //members-init
         planes = new ArrayList<Mission>();
-
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setLandscapeOrientation();
         setRecycleView();
-
-
     }
 
+    //initial map functions - must !
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         try {
@@ -160,7 +156,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             Log.e(TAG, "Can't find style. Error: ", e);
         }
         /*
-        TEST
+        3D if needed
         */
 //
 //        CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -171,14 +167,9 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 //                .build();    // Creates a CameraPosition from the builder
 //        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
 //                cameraPosition));
-        // Position the map's camera near JERUSALEM.
+//      Position the map's camera near JERUSALEM.
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(JERUSALEM));
         googleMapCopy = googleMap;
-//        firstMarker = new MarkerOptions().position(SYDNEY)
-//                .title("My First Mission");
-//        googleMap.addMarker(firstMarker);
-
-
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
@@ -198,7 +189,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        // Create a LatLngBounds that includes the city of Adelaide in Australia.
+        // Create a LatLngBounds that includes the cities BEER_SHEVA and JERUSALEM.
         final LatLngBounds ADELAIDE = new LatLngBounds(BEER_SHEVA, JERUSALEM);
 
         googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
@@ -211,7 +202,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         initMissions();
     }
 
-    private void setLocationProperties() {//location
+    private void setLocationProperties() {//location properties
         askLocationPremission();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -221,6 +212,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         googleMapCopy.getUiSettings().setMyLocationButtonEnabled(false);
     }
 
+    //override user premission in order to fake GPS location (simulations work with that)
     private void askLocationPremission() {
         int permissionCheck = ContextCompat.checkSelfPermission(MapFragment.this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -232,6 +224,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    //choose marker functionality on map
     @Override
     public boolean onMarkerClick(Marker marker) {
         switchRoutes.setChecked(false);
@@ -253,6 +246,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         return true;
     }
 
+    //simulations
     private void initMissions() {
         planes.add(new Mission(this, googleMapCopy));
         planes.get(0).replaceMarker(HAIFA);
@@ -285,6 +279,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         hideAllPlaneLines();
     }
 
+    //init buttons and switches
     private void initGUI() {
         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
         fab4 = (FloatingActionButton) findViewById(R.id.fab4);
@@ -307,6 +302,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    //set cards in recycle view
     private void setRecycleView() {
         DataObject do1 = new DataObject("1", "1");
         DataObject do2 = new DataObject("2", "2");
@@ -317,7 +313,6 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         myDataset.add(do2);
         myDataset.add(do3);
         myDataset.add(do4);
-
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
@@ -326,33 +321,37 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    //we must set orientation to landscape orientation in every activity in order to unable roatation.
     public void setLandscapeOrientation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
+    //hide all plane's lines
     private void hideAllPlaneLines() {
         for (int i = 0; i < planes.size(); i++)
             planes.get(i).hideAllPlaneLines();
         switchRoutes.setChecked(false);
     }
 
+    //display all plane's lines
     private void showAllPlaneLines() {
         for (int i = 0; i < planes.size(); i++)
             planes.get(i).showAllPlaneLines();
     }
 
+    //hide all plane
     private void hideAllPlanes() {
         for (int i = 0; i < planes.size(); i++)
             planes.get(i).getPlaneMarker().setVisible(false);
     }
-
+    //hide all plane
     private void showAllPlanes() {
         for (int i = 0; i < planes.size(); i++)
             planes.get(i).getPlaneMarker().setVisible(true);
     }
 
-
+    //setOnItemClick to the cards - on click open the card view in a new dialog
     @Override
     protected void onResume() {
         super.onResume();
@@ -366,10 +365,12 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+    //send missions to the server
     public void sendToServer(String str) {
         new MissionTask(str).execute();
     }
 
+    //create a new dialog which's equal to the card that's been clicked.
     private void openDialogForResult(int i) {
         CustomDialogFragment editNameDialog = new CustomDialogFragment(context, i);
         int width = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
@@ -381,6 +382,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         editNameDialog.getWindow().setLayout(width, height);
     }
 
+    //switches functionality
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         //Switch Listener
@@ -416,7 +418,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
+    //button functionality
     @Override
     public void onClick(View v) {
         //fabOnClick
@@ -448,12 +450,13 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                     cancelAllFabs();
                 }
                 break;
-            case R.id.fab5:
+            case R.id.fab5: //print log to server
                 showServerConfirmDialog();
                 break;
         }
     }
 
+    //print log to console
     private void printMissionsToLog() {
         for (int i = 0; i < planes.size(); i++) {
             for (int j = 0; j < planes.get(i).getMissionLatLng().size(); j++) {
@@ -464,9 +467,11 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
             }
             Log.d("MISSION", "__________________________________________");
         }
+        Toast.makeText(this,"Log is being sent to the server",Toast.LENGTH_LONG).show();
     }
 
 
+    //confirm a new mission
     private void showMissionConfirmDialog() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -496,6 +501,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                 .show();
     }
 
+    //confirm a send of logs to the server
     private void showServerConfirmDialog() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -511,12 +517,14 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
                 .show();
     }
 
+    //snack instructions
     private void snackOfMissionCreation() {
         mySnackbar = Snackbar.make(findViewById(R.id.app_main_layout),
                 "Click to add route, to finish click on + button.", Snackbar.LENGTH_INDEFINITE);
         mySnackbar.show();
     }
 
+    //cancel all button click listeners
     private void cancelAllFabs() {
         fab1.setEnabled(false);
         fab1.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
@@ -527,6 +535,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         switchMode.setEnabled(false);
     }
 
+    //return all button listeners and colors.
     private void returnAllFabs() {
         fab1.setEnabled(true);
         fab1.setBackgroundTintList(ColorStateList.valueOf(fabColor));
@@ -537,6 +546,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         switchMode.setEnabled(true);
     }
 
+    //get current location from user GPS
     @Override
     public void onMyLocationChange(Location location) {
         planes.add(new Mission(this, googleMapCopy));
@@ -545,6 +555,7 @@ public class MapFragment extends AppCompatActivity implements OnMapReadyCallback
         mapClickToAddRoute = true;
     }
 
+    //toast the elevation from the http-task
     public static void printElevation(String str) {
         Toast.makeText(context, str, Toast.LENGTH_LONG).show();
     }

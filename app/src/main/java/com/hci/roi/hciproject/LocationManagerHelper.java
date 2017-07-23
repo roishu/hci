@@ -33,6 +33,8 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * Created by Roi on 08/07/2017.
  * API KEY : AIzaSyB2uOrMiqG6QDmuzYsd5Zs8mOOfxyEgQ7o
+ * in order to get altitude in any point of the map we using the manager
+ * the manager execute a task, because we creaiting an http request.
  */
 
 public class LocationManagerHelper {
@@ -55,10 +57,6 @@ public class LocationManagerHelper {
                 final double lon = lng;
                 final double lat = lati;
                 final String alt = getElevationFromGoogleMaps(lon, lat)+"";
-               // msg.append("Lon: ");
-                //msg.append(lon);
-                //msg.append(" Lat: ");
-               // msg.append(lat);
                 msg.append(" Alt: ");
                 msg.append(alt);
             }
@@ -66,7 +64,7 @@ public class LocationManagerHelper {
         return msg.toString();
     }
 
-
+    //the task
     class ElevationTask extends AsyncTask<String, Void, Void> {
 
         private Exception exception;
@@ -86,7 +84,6 @@ public class LocationManagerHelper {
                 this.exception = e;
             }
             Log.e(TAG,str);
-            //Toast.makeText(mContext,str,Toast.LENGTH_LONG);
             publishProgress(null);
             return null;
         }
@@ -96,15 +93,16 @@ public class LocationManagerHelper {
             super.onProgressUpdate(values);
         }
 
+        //on task finish we want to print elevation to the user.
         @Override
         protected void onPostExecute(Void mVoid) {
             super.onPostExecute(mVoid);
             Log.d(TAG,"LocationManagerHelper onPostExecute called.");
             MapFragment.printElevation(str);
-            //Toast.makeText(mContext,str,Toast.LENGTH_LONG);
         }
     }
 
+    //http request of exact lat-lng
     private double getElevationFromGoogleMaps(double longitude, double latitude) {
         double result = Double.NaN;
         HttpClient httpClient = new DefaultHttpClient();

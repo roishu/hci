@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.cc.roi.aircc.R;
 
+//unused
 public class MainActivity extends AppCompatActivity {
 
     @Override

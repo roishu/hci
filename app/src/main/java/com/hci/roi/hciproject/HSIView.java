@@ -29,22 +29,18 @@ import com.cc.roi.aircc.R;
 
 public class HSIView extends View {
 
-    private final String LOG = "HSIView";
     private final int POINT_ARRAY_SIZE = 72;
     private final Paint localPaint;
     private final Paint textPaint;
     private final Paint eraserPaint;
     private final Paint pilotPaint;
     private final Paint bgPaint;
-    private Bitmap background;
     private float angle = 0;
 
     private int fps = 100;
-    private boolean showCircles = true;
 
     float alpha = 0;
     Point latestPoint[] = new Point[POINT_ARRAY_SIZE];
-    Paint latestPaint[] = new Paint[POINT_ARRAY_SIZE];
     private int alphaOffset =5;
 
     public HSIView(Context context) {
@@ -58,12 +54,13 @@ public class HSIView extends View {
     public HSIView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        //lines paint
         localPaint = new Paint();
         localPaint.setColor(Color.GREEN);
         localPaint.setAntiAlias(true);
         localPaint.setStyle(Paint.Style.STROKE);
         localPaint.setStrokeWidth(10);
-
+        //eraser paint
         eraserPaint = new Paint();
         eraserPaint.setAlpha(0);
         eraserPaint.setColor(Color.TRANSPARENT);
@@ -72,29 +69,28 @@ public class HSIView extends View {
         eraserPaint.setMaskFilter(null);
         eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         eraserPaint.setAntiAlias(true);
-
+        //text paint (different from other paints because we don't have stroke width here - we have text size)
         textPaint = new Paint();
         textPaint.setColor(Color.GREEN);
         textPaint.setAntiAlias(true);
         textPaint.setStyle(Paint.Style.STROKE);
         textPaint.setTextSize(100);
-
+        //bg - same as ereaser but can be changed
         bgPaint = new Paint();
         bgPaint.setColor(Color.BLACK);
         bgPaint.setStyle(Paint.Style.FILL);
-
         pilotPaint = new Paint();
         ColorFilter filter = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
         pilotPaint.setColorFilter(filter);
 
-
+        //in order to manage memory leak we recycle the bitmap (free space to allocation)
         if(StaticBitmaps.planeBitmap!=null) StaticBitmaps.planeBitmap.recycle();
         StaticBitmaps.planeBitmap = BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.plane_icon);
 
     }
 
-
+    //re-draw animation applying.
     android.os.Handler mHandler = new android.os.Handler();
     Runnable mTick = new Runnable() {
         @Override
@@ -106,8 +102,6 @@ public class HSIView extends View {
 
 
     public void startAnimation() {
-       // mHandler.removeCallbacks(mTick);
-       // mHandler.post(mTick);
     }
 
     public void setAngle(float newAngle){
@@ -115,39 +109,21 @@ public class HSIView extends View {
         invalidate();
     }
 
-    public void stopAnimation() {
-        mHandler.removeCallbacks(mTick);
-    }
-
-    public void setFrameRate(int fps) { this.fps = fps; }
-    public int getFrameRate() { return this.fps; };
-
-    public void setShowCircles(boolean showCircles) { this.showCircles = showCircles; }
-
     @Override
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
-
-
-
         int width = getWidth();
         int height = getHeight();
         int translateOffest = -height/2+width/2;
         canvas.save();
+        //rotate the canvas without the plane
         canvas.rotate(angle,height/2,height/2);
-        //Log.e("ANGLE" ,angle+"" );
-
-
         int r = height; //Math.min(width, height);
-
         //canvas.
         canvas.drawRect(0, 0, width, height, bgPaint); //clean window
         int i = r / 2;
         int j = i - 1;
-
-
-
         alpha = 1;
         double angle = Math.toRadians(alpha);
         int offsetX =  (int) (i + (float)(i * Math.cos(angle)));
@@ -155,6 +131,7 @@ public class HSIView extends View {
 
         latestPoint[0]= new Point(offsetX, offsetY);
 
+        //Lines in Circle
         for (int x=POINT_ARRAY_SIZE-1; x > -1; x--) {
             alpha+=alphaOffset;
             alpha%=360;
@@ -163,6 +140,7 @@ public class HSIView extends View {
             offsetY = (int) (i - (float)(i * Math.sin(angle)));
             latestPoint[x]= new Point(offsetX, offsetY);
         }
+        //Lines in Circle
         for (int x = 1; x < POINT_ARRAY_SIZE; x+=2) {
             Point point = latestPoint[x];
             if (point != null) {
@@ -170,6 +148,7 @@ public class HSIView extends View {
                     canvas.drawCircle(i, i, j * 5 / 6, bgPaint);
             }
         }
+        //Lines in Circle
         for (int x = 0; x < POINT_ARRAY_SIZE; x+=2) {
             Point point = latestPoint[x];
             if (point != null) {
@@ -179,14 +158,16 @@ public class HSIView extends View {
             }
         }
 
+        //Letters
         canvas.drawCircle(i, i, j >> 1, localPaint);
         canvas.drawText("N" , height/2 -25,1*height/4 -25,textPaint);
         canvas.drawText("S" , height/2 -25 ,3*height/4+100,textPaint);
         canvas.drawText("E" , 3*height/4 +25 ,1*height/2+25,textPaint);
         canvas.drawText("W" , 1*height/4 -100 ,1*height/2+25,textPaint);
 
-
+        //we restore in order to rotate and after that draw the plane
         canvas.restore();
+        //right here we're drawing the paint after we apply the new rotation.
         canvas.drawBitmap(StaticBitmaps.planeBitmap, null, new RectF(i-100, i-100, i+100, i+100), pilotPaint);
 
 

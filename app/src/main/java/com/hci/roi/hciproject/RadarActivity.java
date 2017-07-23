@@ -23,6 +23,7 @@ public class RadarActivity extends AppCompatActivity {
 
     }
 
+    //we must set orientation to landscape orientation in every activity in order to unable roatation.
     public void setLandscapeOrientation(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);

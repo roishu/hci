@@ -16,7 +16,13 @@ import java.util.ArrayList;
 
 /**
  * Created by Roi on 14/06/2017.
+ * here we're creation every card and insert it to the recycle view.
+ * each card is created by it location in the recycle view
+ * we simulate animation to the card which equals to the fragment animation
+ * the animations can be only managed by data (also on real-time).
  */
+
+//
 public class MyAdapter extends RecyclerView
         .Adapter<MyAdapter
         .DataObjectHolder> {
@@ -84,7 +90,6 @@ public class MyAdapter extends RecyclerView
                 view = (LayoutInflater.from(myParentView.getContext())
                         .inflate(R.layout.card_adi, myParentView, false));
                 mADIView = (ADIView) view.findViewById(R.id.adiView);
-                mADIView.setShowCircles(true);
                 mADIView.startAnimation();
                 animADI();
                 break;
@@ -113,10 +118,6 @@ public class MyAdapter extends RecyclerView
     @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
 
-
-       // holder.label.setText(mDataset.get(position).getmText1());
-        //holder.dateTime.setText(mDataset.get(position).getmText2());
-        //holder.
     }
 
     public void addItem(DataObject dataObj, int index) {

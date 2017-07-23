@@ -18,6 +18,7 @@ import android.util.Log;
 
 /**
  * Created by Roi on 06/07/2017.
+ * this is a test class in order to try GPS functionality
  */
 
 public class GPSTracker extends Service implements LocationListener {

@@ -12,6 +12,7 @@ import java.net.Socket;
 
 public class MissionTask extends AsyncTask<Void, Void, Void> {
     private String message;
+    private String ip = "ENTER IP HERE"; //afeka : 172.20.16.171
     public MissionTask(String str){
         message = str;
     }
@@ -21,9 +22,10 @@ public class MissionTask extends AsyncTask<Void, Void, Void> {
         //String str = "backspace";
         try {
             Socket socket = new Socket(
-                    "192.168.1.35",
+                    ip,
                     4444);
 
+            //right log to the server in a socket.
             DataOutputStream DOS = new DataOutputStream(socket.getOutputStream());
             DOS.writeUTF(message);
             socket.close();
